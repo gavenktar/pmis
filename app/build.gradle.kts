@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.2")
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -64,6 +64,11 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.androidx.compose.bom)
+    implementation(libs.androidx.ui)
+    implementation(libs.accompanist.navigation.material)
+    implementation(libs.accompanist.drawablepainter)
+    implementation(libs.accompanist.adaptive)
+    implementation(libs.accompanist.testharness)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">wolfquotes</string>
+    <string name="app_name">wolfquotes app</string>
+    <string name="welcome">Welcome to Wolfquoutes app</string>
+    <string name="withlove">With love from Kiryl Arol</string>
+    <string name="about">WolfQuotes is a dynamic application that has taken the world of inspirational and motivational content by storm</string>
+    <string name="mission">At WolfQuotes, our mission is to inspire, motivate, and empower individuals to achieve their dreams and aspirations</string>
+    <string name="connect">Connect us in telegram</string>
+    <string name="donate">Donate us</string>
+    <string name="telegramreference">https://t.me/ggnbe</string>
+    <string name="donatereference">https://www.youtube.com/watch?v=dQw4w9WgXcQ</string>
+
+
 </resources>
