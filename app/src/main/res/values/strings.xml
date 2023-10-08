@@ -8,6 +8,7 @@
     <string name="donate">Donate us</string>
     <string name="telegramreference">https://t.me/ggnbe</string>
     <string name="donatereference">https://www.youtube.com/watch?v=dQw4w9WgXcQ</string>
-
+    <string name="bottom_bar_label_home">Home</string>
+    <string name="bottom_bar_label_about">About</string>
 
 </resources>

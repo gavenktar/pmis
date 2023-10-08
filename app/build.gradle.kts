@@ -2,7 +2,10 @@
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
 }
+
+
 
 android {
     namespace = "by.bsuir.kirylarol.wolfquotes"
@@ -41,22 +44,32 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
             excludes += "/META.INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        addJavaSourceFoldersToModel(
+            File(buildDir, "generated/ksp/$name/kotlin")
+        )
+    }
 }
 
 dependencies {
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.2")
+    implementation(libs.compose.destinations)
+    implementation(libs.googlefonts);
     implementation(libs.core.ktx)
+    implementation(libs.accompanist.navigation.material)
+    ksp(libs.compose.destinations.ksp)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
     implementation(libs.ui)
+    implementation(libs.com.google.devtools.ksp.gradle.plugin)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
@@ -69,6 +82,8 @@ dependencies {
     implementation(libs.accompanist.drawablepainter)
     implementation(libs.accompanist.adaptive)
     implementation(libs.accompanist.testharness)
+    implementation(libs.com.google.devtools.ksp.gradle.plugin)
+    implementation(libs.accompanist.permissions)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

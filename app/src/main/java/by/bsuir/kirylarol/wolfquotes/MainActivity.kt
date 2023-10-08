@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -46,6 +47,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import by.bsuir.kirylarol.wolfquotes.ui.theme.WolfquotesTheme
 import by.bsuir.kirylarol.wolfquotes.ui.theme.gabaritoFamily
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 class MainActivity : ComponentActivity() {
@@ -59,17 +64,18 @@ class MainActivity : ComponentActivity() {
 
 
 
+    @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WolfquotesTheme {
+            WolfquotesTheme(
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AboutScreen();
+                    DestinationsNavHost(navGraph = NavGraphs.root)
                 }
-            }
+            )
         }
     }
 }
@@ -173,8 +179,11 @@ fun LinkCard(text : Int, reference: String, drawItem : Int){
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Preview(device = "spec:parent=pixel_4a,orientation=portrait")
+@Destination
 @Composable
-fun AboutScreen () {
+fun AboutScreen (
+    navigator: DestinationsNavigator
+) {
 
     val aboutStyle = TextStyle(
         color = MaterialTheme.colorScheme.primary,
@@ -224,7 +233,9 @@ fun AboutScreen () {
                     }
                 }
             } else {
-                Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.7f)) {
                     Box(modifier = Modifier.fillMaxWidth(0.3f)) {
                         Wolf()
                     }
