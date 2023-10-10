@@ -16,5 +16,5 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun HomeScreen(
     navigator: DestinationsNavigator
 ){
-    WolfTracker()
+    Text(text ="aboba")
 }
