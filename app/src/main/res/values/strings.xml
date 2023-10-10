@@ -10,5 +10,9 @@
     <string name="donatereference">https://www.youtube.com/watch?v=dQw4w9WgXcQ</string>
     <string name="bottom_bar_label_home">Home</string>
     <string name="bottom_bar_label_about">About</string>
-
+    <string name="nameofquoute">Quote name</string>
+    <string name="descriptionofquote">Quote description\n</string>
+    <string name="startdate">Start date</string>
+    <string name="finishdate">Finish date</string>
+    <string name="submit">Create goal</string>
 </resources>

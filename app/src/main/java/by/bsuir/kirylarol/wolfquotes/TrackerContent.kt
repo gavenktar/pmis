@@ -33,7 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
 import by.bsuir.kirylarol.wolfquotes.destinations.AboutScreenDestination
 import by.bsuir.kirylarol.wolfquotes.destinations.DirectionDestination
-import by.bsuir.kirylarol.wolfquotes.destinations.HomeScreenDestination
+import by.bsuir.kirylarol.wolfquotes.destinations.QuotesWindowDestination
 import by.bsuir.kirylarol.wolfquotes.ui.theme.WolfquotesTheme
 import com.google.accompanist.navigation.material.*
 import com.ramcosta.*;
@@ -53,12 +53,8 @@ fun WolfTracker() {
     val navController = rememberNavController().apply {
         navigatorProvider += bottomSheetNavigator
     }
-
     val currentDestination = navController.appCurrentDestinationAsState() // <- из compose-destinations
-    val showBottomBar by remember { derivedStateOf { currentDestination.value in BottomBarDestinations } } // <- опционально - если в приложении есть боттом бар, настройте его согласно документации
-    ModalBottomSheetLayout(
-        bottomSheetNavigator = bottomSheetNavigator,
-    ) {
+    val showBottomBar by remember { derivedStateOf { currentDestination.value !in excludeList } }
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -78,7 +74,6 @@ fun WolfTracker() {
                 )
             }
         }
-    }
 }
 
 @Composable
@@ -95,9 +90,9 @@ fun WolfNavigationBar(
             NavigationBarItem(
                 selected = isSelected(it),
                 onClick = { onItemClick(it) },
-                icon = { NavBarBadge(it, contentColor, badge) }, // самостоятельно сделайте с помощью BadgedBox / Icon / Text
+                icon = { NavBarBadge(it, contentColor, badge) },
                 label = { NavBarLabel(it) },
-                alwaysShowLabel = false, // ваше решение
+                alwaysShowLabel = false,
             )
         }
     }
@@ -105,43 +100,41 @@ fun WolfNavigationBar(
 
 @Composable
 fun NavBarLabel(it: NavigationBarItem) {
-    Text(text = "aboba")
+    Text(text = it.name)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavBarBadge(it: NavigationBarItem, contentColor: Color, badge: (NavigationBarItem) -> Int?) {
-    BadgedBox(badge = { Badge { Text("8") } }) {
-        Icon(
-            Icons.Filled.Home,
-            contentDescription = "Home"
-        )
-
-    }
+    Icon(imageVector = it.icon , contentDescription = it.name)
 }
 
 enum class NavigationBarItem(val icon: ImageVector, @StringRes val label: Int) { // у энамов могут быть параметры в котлине
-    Home(Icons.Default.Home, R.string.bottom_bar_label_home), // иконки можно найти в material-icons-extended
+    Home(Icons.Default.Home, R.string.bottom_bar_label_home),
     About(Icons.Default.Info, R.string.bottom_bar_label_about)
-    // добавить как минимум два, остальное добавим позже
+}
+
+enum class DisabledBottomBar(@StringRes val label: Int){
+    About(R.string.bottom_bar_label_about),
 }
 
 internal val NavController.bottomBarHandler
-    get() = { it: NavigationBarItem -> navigateTopLevel(it.destination) } // возвращает лямбду для навигации по менюшке
+    get() = { it: NavigationBarItem -> navigateTopLevel(it.destination) }
 
 internal fun NavController.navigateTopLevel(destination: DirectionDestination) = navigate(destination) {
-    launchSingleTop = true // читаем доки чтобы понять что это, про бекстек
-    restoreState = true
-    popUpTo(NavGraphs.root) {
-        inclusive = false
-        saveState = true
-    }
+    launchSingleTop = true
 }
 
 internal val NavigationBarItem.destination: DirectionDestination
     get() = when (this) {
-        NavigationBarItem.Home -> HomeScreenDestination
+        NavigationBarItem.Home -> QuotesWindowDestination
         NavigationBarItem.About -> AboutScreenDestination
     }
 
+internal val DisabledBottomBar.destination: DirectionDestination
+    get() = when (this) {
+        DisabledBottomBar.About -> AboutScreenDestination
+    }
+
 internal val BottomBarDestinations = NavigationBarItem.entries.map { it.destination }.toSet()
+internal val excludeList = DisabledBottomBar.entries.map{it.destination}.toSet()

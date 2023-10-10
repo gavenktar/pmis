@@ -22,11 +22,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +54,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.IconButtonColors
 
 
 class MainActivity : ComponentActivity() {
@@ -68,197 +74,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WolfquotesTheme(
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    DestinationsNavHost(navGraph = NavGraphs.root)
-                }
-            )
-        }
-    }
-}
-
-
-
-@Composable
-fun Motivation(){
-
-    val mainStyle = TextStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontFamily = gabaritoFamily,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.W300,
-        textAlign = TextAlign.Center
-
-    )
-
-    Box() {
-                Column() {
-                    MainActivity.aboutStrings.forEach { id ->
-                        Text(
-                            text = stringResource(id = id),
-                            style = mainStyle,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(3.dp),
-                        )
-                    }
-                }
-            }
-}
-
-
-@Composable
-fun Wolf(){
-    val borderColor = if (isSystemInDarkTheme()){
-        Color.Cyan;
-    }else{
-        Color.Black;
-    }
-
-    Image(
-        painter = painterResource(id = R.drawable.wolf),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                BorderStroke(3.dp, borderColor),
-                RoundedCornerShape(16.dp)
-            )
-            .clip(RoundedCornerShape(16.dp))
-
-
-    )
-}
-
-@Composable
-fun LinkCard(text : Int, reference: String, drawItem : Int){
-
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
-
-
-    val aboutStyle = TextStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontFamily = gabaritoFamily,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.W300,
-        textAlign = TextAlign.Center
-
-    )
-
-    Text(
-        text = stringResource(id = text),
-        style = aboutStyle,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 2.dp)
-    )
-    IconButton(
-        onClick = {
-            val intent = Intent(Intent.ACTION_VIEW, reference.toUri())
-            launcher.launch(intent);
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(2.dp)
-            .size(50.dp)
-    ) {
-        Image(
-            painter = painterResource(id = drawItem),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
-        )
-    }
-}
-
-
-@SuppressLint("UnusedBoxWithConstraintsScope")
-@Preview(device = "spec:parent=pixel_4a,orientation=portrait")
-@Destination
-@Composable
-fun AboutScreen (
-    navigator: DestinationsNavigator
-) {
-
-    val aboutStyle = TextStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontFamily = gabaritoFamily,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.W300,
-        textAlign = TextAlign.Center
-
-    )
-
-
-    val mainStyle = TextStyle(
-        color = MaterialTheme.colorScheme.primary,
-        fontFamily = gabaritoFamily,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.W300,
-        textAlign = TextAlign.Center
-
-    )
-
-    val donateReference = stringResource(id = R.string.donatereference);
-    val contactReference = stringResource(id = R.string.telegramreference);
-
-
-    Column(
-        Modifier.padding(20.dp)
-    )
-    {
-        Text(
-            text = stringResource(id = R.string.welcome),
-            style = mainStyle,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .verticalScroll(rememberScrollState()),
-        )
-        BoxWithConstraints (
-            Modifier
-                .align(Alignment.CenterHorizontally)
-        ) {
-            if (maxHeight > maxWidth) {
-                Column {
-                    Wolf()
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    Box() {
-                        Motivation()
-                    }
-                }
-            } else {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.7f)) {
-                    Box(modifier = Modifier.fillMaxWidth(0.3f)) {
-                        Wolf()
-                    }
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    Motivation()
-                }
-            }
-        }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 30.dp)
-                    , verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(Modifier.fillMaxWidth(0.5f)) {
-                    LinkCard(R.string.connect,contactReference,R.drawable.telegram);
-                }
-                Column(Modifier.fillMaxWidth()) {
-                    LinkCard(R.string.donate,donateReference,R.drawable.donate);
-                }
+            WolfquotesTheme {
+                WolfTracker()
             }
         }
     }
+}
+
 
 
 
