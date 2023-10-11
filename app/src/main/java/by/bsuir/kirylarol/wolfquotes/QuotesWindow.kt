@@ -88,18 +88,10 @@ fun QuotesContent(
     val errorText = stringResource(R.string.error);
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val snackbarHost =
     var showError by remember { mutableStateOf(false)}
     Scaffold (
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState,
-            snackbar = {
-                SnackbarItem(
-                    imageVector = Icons.Filled.Check,
-                    text = stringResource(R.string.succesful_added),
-                )
-            }
-        ) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)
+        },
             floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -109,7 +101,7 @@ fun QuotesContent(
                         val result = snackbarHostState.showSnackbar(
                             message = "Успешно добавлено",
                             actionLabel = "ОК",
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Indefinite
                         )
                         when (result) {
                             SnackbarResult.ActionPerformed -> {
