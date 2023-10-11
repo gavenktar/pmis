@@ -15,4 +15,6 @@
     <string name="startdate">Start date</string>
     <string name="finishdate">Finish date</string>
     <string name="submit">Create goal</string>
+    <string name="succesful_added">succesful added</string>
+    <string name="error">Error ocurred</string>
 </resources>

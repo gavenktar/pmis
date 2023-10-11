@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -31,15 +30,10 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import org.koin.core.component.getScopeName
-import org.koin.dsl.module
-import java.nio.file.WatchEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -82,6 +76,34 @@ class QuoteViewModel : ViewModel(){
 
 
 @Composable
+fun CardIcon(
+    iconID:  ImageVector,
+    onClick:  (Quote) -> Unit,
+    modifier: Modifier = Modifier,
+    content : String,
+    quote : Quote
+){
+
+    IconButton(
+        modifier = modifier
+            .border(
+                2.dp,
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.shapes.small
+            )
+            .aspectRatio(1.0f),
+        onClick = { onClick(quote) },
+    ) {
+        Icon(
+            imageVector = iconID,
+            contentDescription = content,
+            modifier = modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
 fun QuoteItem(
     quote : Quote,
     onInfo : (Quote) -> Unit,
@@ -95,7 +117,8 @@ fun QuoteItem(
         modifier = modifier.fillMaxSize(),
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(2.dp,MaterialTheme.colorScheme.secondary)
-        ){
+        ) {
+
         Row (modifier = Modifier.fillMaxSize()) {
             Column (modifier = modifier.fillMaxWidth(0.5f)){
                 Text(
@@ -135,25 +158,13 @@ fun QuoteItem(
                     if (!quote.completed){
                         Icon = Icons.Default.Check
                     }
-                    IconButton(
-                        modifier = modifier
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.shapes.small
-                            )
-                            .aspectRatio(1.0f),
-                        onClick = {
-
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icon,
-                            contentDescription = "Check",
-                            modifier = modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    CardIcon(
+                        modifier = modifier,
+                        iconID = Icon,
+                        onClick = {},
+                        content = "Complete",
+                        quote = quote
+                    )
                 }
                 Spacer(modifier = Modifier.height(5.dp))
                 Box( modifier  = Modifier
@@ -161,25 +172,27 @@ fun QuoteItem(
                     .align(Alignment.End)
                     .weight(1f)
                 ) {
-                    IconButton(
-                        modifier = modifier
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.shapes.small
-                            )
-                            .aspectRatio(1.0f),
-                        onClick = {
-                            onInfo(quote)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
-                            modifier = modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                    CardIcon(
+                        modifier = modifier,
+                        iconID = Icons.Default.Info,
+                        onClick = {onInfo(quote)},
+                        content = "Info",
+                        quote = quote
+                    )
                     }
+                Spacer(modifier = Modifier.height(5.dp))
+                Box( modifier  = Modifier
+                    .fillMaxHeight()
+                    .align(Alignment.End)
+                    .weight(1f)
+                ) {
+                    CardIcon(
+                        modifier = modifier,
+                        iconID = Icons.Default.Edit,
+                        onClick =  {onEdit(quote)},
+                        content = "Edit",
+                        quote = quote
+                    )
                 }
                 Spacer(modifier = Modifier.height(5.dp))
                 Box( modifier  = Modifier
@@ -187,60 +200,21 @@ fun QuoteItem(
                     .align(Alignment.End)
                     .weight(1f)
                 ) {
-                    IconButton(
-                        modifier = modifier
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.shapes.small
-                            )
-                            .aspectRatio(1.0f),
-                        onClick = {
-                            onEdit(quote)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            modifier = modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(5.dp))
-                Box( modifier  = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.End)
-                    .weight(1f)
-                ) {
-                    IconButton(
-                        modifier = modifier
-                            .border(
-                                2.dp,
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.shapes.small
-                            )
-                            .aspectRatio(1.0f),
-                        onClick = {
-                            onRemove(quote)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            modifier = modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                    CardIcon(
+                        modifier = modifier,
+                        iconID = Icons.Default.Delete,
+                        onClick = { onRemove(quote) },
+                        content = "Remove",
+                        quote = quote
+                    )
                     }
 
                 }
-
-
             }
         }
 
     }
-}
+
 @Composable
 fun DateCard(
     date : LocalDate,
