@@ -3,9 +3,15 @@ plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
+
 }
 
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schema")
+    arg("room.incremental", "true")
+    arg("room.expandProjection", "true")
+}
 
 android {
     namespace = "by.bsuir.kirylarol.wolfquotes"
@@ -65,6 +71,21 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.accompanist.navigation.material)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.ktor.client.auth)
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.server.data.conversion)
+    implementation(libs.ktor.client.cio)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.rxjava2)
+    implementation(libs.androidx.room.rxjava3)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     ksp(libs.compose.destinations.ksp)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -93,4 +114,7 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.androidx.ui.tooling)
+
+
+
 }

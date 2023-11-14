@@ -1,7 +1,10 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Screens.EditWindow
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.bsuir.kirylarol.wolfquotes.Entity.Quote
+import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
+import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import java.util.UUID
@@ -42,7 +45,7 @@ class EditQuoteViewModel(
             quote?.description ?: "",
             quote?.dateCreated ?: LocalDate.now(),
             quote?.dateEnd ?: LocalDate.now(),
-            quote?.completed?: false,
+            quote?.completed ?: false,
             quote?.id,
             saved
         )

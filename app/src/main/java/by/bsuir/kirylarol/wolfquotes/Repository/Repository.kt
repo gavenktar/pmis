@@ -1,5 +1,8 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Repository
 
+import by.bsuir.kirylarol.wolfquotes.DataSource.InMemoryDataSource
+import by.bsuir.kirylarol.wolfquotes.DataSource.QuoteDataSource
+import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.util.UUID

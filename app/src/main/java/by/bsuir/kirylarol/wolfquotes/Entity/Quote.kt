@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Entity
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -25,22 +25,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -119,7 +109,7 @@ fun QuoteItem(
                         DateCard(date = quote.dateCreated, modifier = Modifier
                             .fillMaxHeight(0.5f)
                             .padding(5.dp))
-                        DateCard(date = quote.dateCreated, modifier = Modifier
+                        DateCard(date = quote.dateEnd, modifier = Modifier
                             .fillMaxHeight()
                             .padding(5.dp))
                     }

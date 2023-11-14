@@ -1,48 +1,35 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Screens.QuoteWindow
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.graphics.Paint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,10 +37,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import by.bsuir.kirylarol.wolfquotes.destinations.QuotesWindowDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -65,7 +50,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import by.bsuir.kirylarol.wolfquotes.destinations.EditQuoteDestination
+import by.bsuir.kirylarol.wolfquotes.Entity.Quote
+import by.bsuir.kirylarol.wolfquotes.Entity.QuoteItem
+import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
+import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
+import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolfquotes.Screens.destinations.EditQuoteDestination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -76,11 +66,10 @@ import java.util.UUID
 import kotlin.random.Random
 
 
-
 sealed interface HomeState {
     data object Loading : HomeState
-    data object Empty: HomeState
-    data class DisplayingQuotes(val quotes: List<Quote>): HomeState
+    data object Empty : HomeState
+    data class DisplayingQuotes(val quotes: List<Quote>) : HomeState
     data class Error(val e: Exception) : HomeState
 
 }
@@ -95,7 +84,7 @@ class HomeViewModel(
         repository.getQuotes(),
         loading,
     ) { quotes, loading ->
-        if (loading ) HomeState.Loading else HomeState.DisplayingQuotes(quotes)
+        if (loading) HomeState.Loading else HomeState.DisplayingQuotes(quotes)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), HomeState.Loading)
 
@@ -105,11 +94,10 @@ class HomeViewModel(
         loading.update { false }
     }
 
-
-    fun onClickDone (id : UUID) = viewModelScope.launch {
+    fun onClickDone(id: UUID) = viewModelScope.launch {
         loading.update { true }
         repository.setDone(id)
-        loading.update{false}
+        loading.update { false }
     }
 }
 
@@ -119,72 +107,70 @@ class HomeViewModel(
 @Composable
 fun QuotesWindow(
     navigator: DestinationsNavigator
-){
+) {
     val viewModel = viewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     QuotesContent(
         state = state,
         onEdit = {
-            navigator.navigate(EditQuoteDestination(it,true))
-                 },
+            navigator.navigate(EditQuoteDestination(it, true))
+        },
         onInfo = {
-            navigator.navigate(EditQuoteDestination(it,false))
+            navigator.navigate(EditQuoteDestination(it, false))
         },
         onRemove = viewModel::onClickRemove,
         onDone = viewModel::onClickDone
-    )}
+    )
+}
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun QuotesContent(
-    state : HomeState,
+    state: HomeState,
     onRemove: (id: UUID) -> Unit,
     onEdit: (id: UUID?) -> Unit,
-    onInfo: (id : UUID?) -> Unit,
-    onDone : (id: UUID) -> Unit
-    )
-{
+    onInfo: (id: UUID?) -> Unit,
+    onDone: (id: UUID) -> Unit
+) {
 
     val errorText = stringResource(R.string.error);
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showError by remember { mutableStateOf(false)}
+    var showError by remember { mutableStateOf(false) }
 
-    Scaffold (
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
-            floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 println("in snackbar")
                 if (Random.nextBoolean()) {
+                    onEdit(null)
                     scope.launch {
                         val result = snackbarHostState.showSnackbar(
                             message = "Успешно добавлено",
                             actionLabel = "ОК",
                             duration = SnackbarDuration.Indefinite
                         )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                            }
-
-                            SnackbarResult.Dismissed -> {
-
-                            }
-
-                        }
-                        onEdit(null)
-                        showError =false;
+                        showError = false;
                     }
-                }else{
+                } else {
                     showError = true;
                 }
 
-        }){
-            Icon(imageVector = Icons.Default.Add, contentDescription = "AddQuote", tint = MaterialTheme.colorScheme.primary)
-        }},
-    ){
-        if (showError){
-            SnackbarItem (
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "AddQuote",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+    ) {
+        if (showError) {
+            SnackbarItem(
                 Icons.Default.Close,
                 errorText
             )
@@ -207,11 +193,15 @@ fun QuotesContent(
                         onEdit = { onEdit(item.id) },
                         onRemove = { onRemove(item.id) },
                         onInfo = { onInfo(item.id) },
-                        onComplete = { onDone(item.id)}
+                        onComplete = { onDone(item.id) }
                     )
                 }
             }
-            is HomeState.Error -> Text(state.e.message ?: stringResource(id = R.string.error_message))
+
+            is HomeState.Error -> Text(
+                state.e.message ?: stringResource(id = R.string.error_message)
+            )
+
             is HomeState.Loading -> {
                 Box(
                     modifier = Modifier
@@ -224,6 +214,7 @@ fun QuotesContent(
                     )
                 }
             }
+
             else -> throw AssertionError()
         }
     }
@@ -232,7 +223,7 @@ fun QuotesContent(
 
 @Preview
 @Composable
-fun QuotesWindowPreview(){
+fun QuotesWindowPreview() {
     QuotesWindow(navigator = EmptyDestinationsNavigator)
 }
 
@@ -241,9 +232,8 @@ fun QuotesWindowPreview(){
 @Composable
 fun SnackbarItem(
     imageVector: ImageVector,
-    text : String,
+    text: String,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var open by remember {
         mutableStateOf(true)
@@ -275,12 +265,13 @@ fun SnackbarItem(
                         .weight(3f),
                     tint = MaterialTheme.colorScheme.surfaceTint
                 )
-                Button(onClick = {
-                    open = false;
-                }, modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1.5f)
-                    .align(CenterHorizontally),
+                Button(
+                    onClick = {
+                        open = false;
+                    }, modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1.5f)
+                        .align(CenterHorizontally),
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(

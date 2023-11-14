@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Screens.EditWindow
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +36,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.Job
+import by.bsuir.kirylarol.wolfquotes.R
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.reflect.KFunction7
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,50 +123,16 @@ fun EditQuoteContent(
                                     .fillMaxSize()
                                     .padding(5.dp)
                             ) {
-                                OutlinedTextField(
-                                    value = title,
-                                    onValueChange = { newText ->
-                                        title = newText
-                                    },
-                                    label = { Text(stringResource(id = R.string.nameofquoute)) },
-                                    modifier = Modifier
-                                        .align(CenterHorizontally)
-                                        .fillMaxWidth()
-                                        .fillMaxSize()
-                                        .weight(1f)
-                                        .padding(5.dp),
-                                    shape = MaterialTheme.shapes.small,
-                                    enabled = changeMode
-                                )
-                                OutlinedTextField(
-                                    value = description,
-                                    onValueChange = { newText ->
-                                        description = newText
-                                    },
-                                    label = { Text(stringResource(id = R.string.descriptionofquote)) },
-                                    modifier = Modifier
-                                        .align(CenterHorizontally)
-                                        .fillMaxWidth()
-                                        .fillMaxSize()
-                                        .weight(2f)
-                                        .padding(5.dp),
-                                    shape = MaterialTheme.shapes.small,
-                                    enabled = changeMode
-                                )
-
                                 if (changeMode) {
-
                                     DatePicker(
                                         state = startState,
                                         modifier = Modifier
-                                            .padding(16.dp)
-                                            .fillMaxWidth()
+                                            .padding(5.dp)
                                     )
                                     DatePicker(
                                         state = endState,
                                         modifier = Modifier
-                                            .padding(16.dp)
-                                            .fillMaxWidth()
+                                            .padding(5.dp)
                                     )
                                 }else{
                                     OutlinedTextField(
@@ -200,6 +165,36 @@ fun EditQuoteContent(
                                     )
 
                                 }
+                                OutlinedTextField(
+                                    value = title,
+                                    onValueChange = { newText ->
+                                        title = newText
+                                    },
+                                    label = { Text(stringResource(id = R.string.nameofquoute)) },
+                                    modifier = Modifier
+                                        .align(CenterHorizontally)
+                                        .fillMaxWidth()
+                                        .fillMaxSize()
+                                        .weight(1f)
+                                        .padding(5.dp),
+                                    shape = MaterialTheme.shapes.small,
+                                    enabled = changeMode
+                                )
+                                OutlinedTextField(
+                                    value = description,
+                                    onValueChange = { newText ->
+                                        description = newText
+                                    },
+                                    label = { Text(stringResource(id = R.string.descriptionofquote)) },
+                                    modifier = Modifier
+                                        .align(CenterHorizontally)
+                                        .fillMaxWidth()
+                                        .fillMaxSize()
+                                        .weight(2f)
+                                        .padding(5.dp),
+                                    shape = MaterialTheme.shapes.small,
+                                    enabled = changeMode
+                                )
 
                                 FilledTonalButton(
                                     onClick = {

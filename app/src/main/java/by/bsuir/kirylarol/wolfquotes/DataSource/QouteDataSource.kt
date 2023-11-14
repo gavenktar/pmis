@@ -1,5 +1,6 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.DataSource
 
+import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

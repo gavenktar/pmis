@@ -9,6 +9,7 @@ lifecycle-runtime-ktx = "2.6.2"
 activity-compose = "1.7.2"
 compose-bom = "2023.03.00"
 destanations = "1.8.42-beta"
+room_version = "2.6.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -40,8 +41,21 @@ accompanist-permissions = { group = "com.google.accompanist", name = "accompanis
 compose-destinations = {group="io.github.raamcosta.compose-destinations", name = "animations-core", version.ref = "destanations"}
 compose-destinations-ksp = {group="io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "destanations"}
 
+
+
 googlefonts = {group = "androidx.compose.ui", name = "ui-text-google-fonts", version="1.5.2"}
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.7.0-beta01" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version = "2.6.0" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version = "2.6.0" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version = "2.6.0" }
+androidx-room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version = "2.6.0" }
+androidx-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version = "2.6.0" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version = "2.3.6" }
+ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging", version = "2.3.6" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version = "2.3.6" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version = "2.3.6" }
+ktor-server-data-conversion = { group = "io.ktor", name = "ktor-server-data-conversion", version = "2.3.6" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version = "2.3.6" }
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }

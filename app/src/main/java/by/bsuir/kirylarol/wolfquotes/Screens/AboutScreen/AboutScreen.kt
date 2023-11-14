@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes
+package by.bsuir.kirylarol.wolfquotes.Screens.AboutScreen
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -45,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import by.bsuir.kirylarol.wolfquotes.MainActivity
+import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolfquotes.ui.theme.gabaritoFamily
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -222,10 +224,10 @@ fun AboutScreen (
             , verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.fillMaxWidth(0.5f)) {
-                LinkCard(R.string.connect,contactReference,R.drawable.telegram);
+                LinkCard(R.string.connect,contactReference, R.drawable.telegram);
             }
             Column(Modifier.fillMaxWidth()) {
-                LinkCard(R.string.donate,donateReference,R.drawable.donate);
+                LinkCard(R.string.donate,donateReference, R.drawable.donate);
             }
         }
     }
