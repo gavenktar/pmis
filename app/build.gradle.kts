@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.googlefonts);
     implementation(libs.core.ktx)
     implementation(libs.accompanist.navigation.material)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     ksp(libs.compose.destinations.ksp)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)

@@ -1,6 +1,8 @@
 package by.bsuir.kirylarol.wolfquotes
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.Paint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalButton
@@ -59,9 +62,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import by.bsuir.kirylarol.wolfquotes.destinations.EditQuoteDestination
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.random.Random
+
+
+
+sealed interface HomeState {
+    data object Loading : HomeState
+    data object Empty: HomeState
+    data class DisplayingQuotes(val quotes: List<Quote>): HomeState
+    data class Error(val e: Exception) : HomeState
+
+}
+
+class HomeViewModel(
+    private val repository: QuoteRepository = QuoteRepositoryImpl,
+) : ViewModel() {
+
+    private val loading = MutableStateFlow(false)
+
+    val state = combine(
+        repository.getQuotes(),
+        loading,
+    ) { quotes, loading ->
+        if (loading ) HomeState.Loading else HomeState.DisplayingQuotes(quotes)
+    }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), HomeState.Loading)
+
+    fun onClickRemove(id: UUID) = viewModelScope.launch {
+        loading.update { true }
+        repository.delete(id)
+        loading.update { false }
+    }
+
+
+    fun onClickDone (id : UUID) = viewModelScope.launch {
+        loading.update { true }
+        repository.setDone(id)
+        loading.update{false}
+    }
+}
+
 
 @RootNavGraph(start = true)
 @Destination
@@ -69,26 +120,35 @@ import kotlin.random.Random
 fun QuotesWindow(
     navigator: DestinationsNavigator
 ){
-    val viewModel = viewModel<QuoteViewModel>()
-    QuotesContent(items = viewModel.items, onRemove = viewModel::onClickRemove, onAdd = viewModel::onClickAdd, onEdit = { navigator.navigate(EditQuoteDestination) }, onComplete = {}, onInfo = {}, navigator = navigator)
-}
+    val viewModel = viewModel<HomeViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    QuotesContent(
+        state = state,
+        onEdit = {
+            navigator.navigate(EditQuoteDestination(it,true))
+                 },
+        onInfo = {
+            navigator.navigate(EditQuoteDestination(it,false))
+        },
+        onRemove = viewModel::onClickRemove,
+        onDone = viewModel::onClickDone
+    )}
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun QuotesContent(
-    items : List<Quote>,
-    onAdd : (Quote) -> Unit,
-    onInfo : (Quote) -> Unit,
-    onComplete : (Quote) -> Unit,
-    onEdit : (Quote) -> Unit,
-    onRemove : (Quote) -> Unit,
-    navigator: DestinationsNavigator
-)
+    state : HomeState,
+    onRemove: (id: UUID) -> Unit,
+    onEdit: (id: UUID?) -> Unit,
+    onInfo: (id : UUID?) -> Unit,
+    onDone : (id: UUID) -> Unit
+    )
 {
 
     val errorText = stringResource(R.string.error);
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var showError by remember { mutableStateOf(false)}
+
     Scaffold (
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)
         },
@@ -112,13 +172,12 @@ fun QuotesContent(
                             }
 
                         }
-                        onAdd(Quote());
+                        onEdit(null)
                         showError =false;
                     }
                 }else{
                     showError = true;
                 }
-            // navigator.navigate(EditQuoteDestination);
 
         }){
             Icon(imageVector = Icons.Default.Add, contentDescription = "AddQuote", tint = MaterialTheme.colorScheme.primary)
@@ -130,29 +189,46 @@ fun QuotesContent(
                 errorText
             )
         }
-        LazyColumn(
-            Modifier.padding(5.dp)
-        ){
-            items(
-                items = items,
-                key = { quote ->
-                    quote.id
+        when (state) {
+            is HomeState.DisplayingQuotes -> LazyColumn(
+                Modifier.padding(5.dp)
+            ) {
+                items(
+                    items = state.quotes,
+                    key = {
+                        it.id
+                    }
+                ) { item ->
+                    QuoteItem(
+                        quote = item,
+                        modifier = Modifier
+                            .heightIn(200.dp, 220.dp)
+                            .padding(5.dp),
+                        onEdit = { onEdit(item.id) },
+                        onRemove = { onRemove(item.id) },
+                        onInfo = { onInfo(item.id) },
+                        onComplete = { onDone(item.id)}
+                    )
                 }
-            ) { item ->
-                QuoteItem(
-                    quote = item,
-                    modifier = Modifier
-                        .heightIn(200.dp, 220.dp)
-                        .padding(5.dp),
-                    onInfo = onInfo,
-                    onComplete = onComplete,
-                    onEdit = onEdit,
-                    onRemove = onRemove
-                )
             }
+            is HomeState.Error -> Text(state.e.message ?: stringResource(id = R.string.error_message))
+            is HomeState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxSize(0.5f)
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+            else -> throw AssertionError()
         }
     }
 }
+
 
 @Preview
 @Composable

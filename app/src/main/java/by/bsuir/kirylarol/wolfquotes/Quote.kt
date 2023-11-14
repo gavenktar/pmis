@@ -34,6 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -43,36 +50,10 @@ data class Quote(
     val description: String = "",
     val dateCreated: LocalDate = LocalDate.now(),
     val dateEnd: LocalDate = LocalDate.now(),
-    val completed: Boolean = false,
+    var completed: Boolean = false,
     val id: UUID  = UUID.randomUUID()
     )
 
-
-class QuoteViewModel : ViewModel(){
-
-    val items: SnapshotStateList<Quote> = DefaultQuotes.toMutableStateList()
-    fun onClickRemove(quote: Quote) = items.remove(quote)
-    fun onClickAdd (quote: Quote) {
-        items.add(Quote("Сделать двесте подтягиваний", "Пора ставить себе новые рекорды",  LocalDate.of(2023,10,8),LocalDate.of(2023,7,6),false))
-    }
-
-    @Composable
-    fun onClickEdit(quote: Quote) {
-        EditQuote(quote  = quote)
-    }
-    ;
-
-    private companion object {
-        private val DefaultQuotes = listOf(
-            Quote("Сделать сто подтягиваний", "Все понятно?", LocalDate.of(2023,6,6),LocalDate.of(2023,7,6),true),
-            Quote("Сделать двесте подтягиваний", "Пора ставить себе новые рекорды",  LocalDate.of(2023,10,8),LocalDate.of(2023,7,6),false),
-            Quote("Сделать сто подтягиваний", "Все понятно?", LocalDate.of(2023,6,6),LocalDate.of(2023,7,6),true),
-            Quote("Сделать двесте подтягиваний", "Пора ставить себе новые рекорды",  LocalDate.of(2023,10,8),LocalDate.of(2023,7,6),false),
-            Quote("Сделать сто подтягиваний", "Все понятно?", LocalDate.of(2023,6,6),LocalDate.of(2023,7,6),true),
-            Quote("Сделать двесте подтягиваний", "Пора ставить себе новые рекорды",  LocalDate.of(2023,10,8),LocalDate.of(2023,7,6),false),
-        )
-    }
-}
 
 
 @Composable
@@ -107,7 +88,7 @@ fun CardIcon(
 fun QuoteItem(
     quote : Quote,
     onInfo : (Quote) -> Unit,
-    onComplete : (Quote) -> Unit,
+    onComplete : (UUID) -> Unit,
     onEdit : (Quote) -> Unit,
     onRemove : (Quote) -> Unit,
     modifier: Modifier = Modifier
@@ -161,7 +142,7 @@ fun QuoteItem(
                     CardIcon(
                         modifier = modifier,
                         iconID = Icon,
-                        onClick = {},
+                        onClick ={ onComplete(quote.id) },
                         content = "Complete",
                         quote = quote
                     )
