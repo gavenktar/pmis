@@ -87,11 +87,11 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
 
     override suspend fun delete(id: UUID) {
         delay(1000L)
-        tasks.remove(id)
         var task = tasks[id]
         if (task != null) {
             dao.delete(toTaskEntity(task))
         }
+        tasks.remove(id)
         _tasksFlow.emit(tasks)
     }
 
