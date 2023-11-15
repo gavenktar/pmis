@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes.Screens.EditWindow
+package by.bsuir.kirylarol.wolftasks.Screens.EditWindow
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +37,8 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolftasks.Screens.QuoteWindow.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.util.UUID
 
@@ -44,15 +46,16 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @com.ramcosta.composedestinations.annotation.Destination
 @Composable
-fun EditQuote(
-    quoteUUID: UUID?,
+fun EditTask(
+    taskUUID: UUID?,
     navigator: DestinationsNavigator = EmptyDestinationsNavigator,
-    changeMode : Boolean
+    changeMode : Boolean,
+    viewModel : EditTaskViewModel = koinViewModel()
+
 ) {
-    val viewModel = viewModel<EditQuoteViewModel> { EditQuoteViewModel(quoteUUID) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state) {
-        if ((state as? EditViewState.EditingQuote)?.saved == true) navigator.navigateUp()
+        if ((state as? EditViewState.EditingTask)?.saved == true) navigator.navigateUp()
     }
 
     fun onBack (){
@@ -61,7 +64,7 @@ fun EditQuote(
 
 
 
-    EditQuoteContent(
+    EditTaskContent(
         state = state,
         onSave = viewModel::onClickSave,
         onBack = ::onBack,
@@ -74,11 +77,11 @@ fun EditQuote(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditQuoteContent(
+fun EditTaskContent(
     state: EditViewState,
     onSave:  (String, String, LocalDate, LocalDate, Boolean, UUID? )  -> Unit,
     onBack: () -> Unit,
-    changeMode : Boolean
+    changeMode : Boolean,
 ) {
         Box(
             modifier = Modifier
@@ -89,7 +92,7 @@ fun EditQuoteContent(
             when (state) {
                 is EditViewState.Error -> Text(state.e.message ?: stringResource(id = R.string.error_message))
                 is EditViewState.Loading -> CircularProgressIndicator()
-                is EditViewState.EditingQuote -> {
+                is EditViewState.EditingTask -> {
                     var showBottomSheet by remember { mutableStateOf(true) }
                     var title by remember(state.title) { mutableStateOf(state.title) }
                     var description by remember(state.description) { mutableStateOf(state.description) }

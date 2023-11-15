@@ -28,12 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
+import by.bsuir.kirylarol.NavGraphs
+import by.bsuir.kirylarol.appCurrentDestinationAsState
+import by.bsuir.kirylarol.destinations.AboutScreenDestination
+import by.bsuir.kirylarol.destinations.DirectionDestination
+import by.bsuir.kirylarol.destinations.TasksWindowDestination
 import by.bsuir.kirylarol.wolfquotes.R
-import by.bsuir.kirylarol.wolfquotes.Screens.NavGraphs
-import by.bsuir.kirylarol.wolfquotes.Screens.appCurrentDestinationAsState
-import by.bsuir.kirylarol.wolfquotes.Screens.destinations.AboutScreenDestination
-import by.bsuir.kirylarol.wolfquotes.Screens.destinations.DirectionDestination
-import by.bsuir.kirylarol.wolfquotes.Screens.destinations.QuotesWindowDestination
 import com.google.accompanist.navigation.material.*
 import com.ramcosta.*;
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -124,7 +124,7 @@ internal fun NavController.navigateTopLevel(destination: DirectionDestination) =
 
 internal val NavigationBarItem.destination: DirectionDestination
     get() = when (this) {
-        NavigationBarItem.Home -> QuotesWindowDestination
+        NavigationBarItem.Home -> TasksWindowDestination
         NavigationBarItem.About -> AboutScreenDestination
     }
 

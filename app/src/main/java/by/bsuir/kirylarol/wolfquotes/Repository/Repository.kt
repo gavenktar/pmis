@@ -1,31 +1,34 @@
 package by.bsuir.kirylarol.wolfquotes.Repository
 
-import by.bsuir.kirylarol.wolfquotes.DataSource.InMemoryDataSource
-import by.bsuir.kirylarol.wolfquotes.DataSource.QuoteDataSource
-import by.bsuir.kirylarol.wolfquotes.Entity.Quote
+import by.bsuir.kirylarol.wolftasks.DataSource.InMemoryDataSource
+import by.bsuir.kirylarol.wolftasks.DataSource.RoomTaskDataSource
+import by.bsuir.kirylarol.wolftasks.DataSource.TaskDataSource
+import by.bsuir.kirylarol.wolftasks.Entity.Task
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import org.koin.java.KoinJavaComponent.inject
 import java.util.UUID
+import javax.sql.DataSource
 
-interface QuoteRepository {
+interface TaskRepository {
 
-    fun getQuotes(): Flow<List<Quote>>
-    fun getQuote(id: UUID?): Flow<Quote?>
+    fun getTasks(): Flow<List<Task>>
+    fun getTask(id: UUID?): Flow<Task?>
 
-    suspend fun upsert(quote: Quote)
+    suspend fun upsert(Task: Task)
 
     suspend fun delete(id: UUID)
     suspend fun setDone (id: UUID)
 }
 
-object QuoteRepositoryImpl : QuoteRepository {
+class TaskRepositoryImpl (
+    private val dataSource: TaskDataSource
+) : TaskRepository{
 
-    private val dataSource: QuoteDataSource = InMemoryDataSource
+    override fun getTasks(): Flow<List<Task>> = dataSource.getTasks()
+    override fun getTask(id: UUID?): Flow<Task?> = id?.let { dataSource.getTask(it) } ?: flowOf(null)
 
-    override fun getQuotes(): Flow<List<Quote>> = dataSource.getQuotes()
-    override fun getQuote(id: UUID?): Flow<Quote?> = id?.let { dataSource.getQuote(it) } ?: flowOf(null)
-
-    override suspend fun upsert(quote: Quote) = dataSource.upsert(quote)
+    override suspend fun upsert(Task: Task) = dataSource.upsert(Task)
     override suspend fun delete(id: UUID) = dataSource.delete(id)
 
     override suspend fun setDone(id: UUID) {

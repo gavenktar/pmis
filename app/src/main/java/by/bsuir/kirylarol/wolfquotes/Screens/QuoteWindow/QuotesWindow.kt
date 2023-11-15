@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes.Screens.QuoteWindow
+package by.bsuir.kirylarol.wolftasks.Screens.QuoteWindow
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -50,41 +51,42 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import by.bsuir.kirylarol.wolfquotes.Entity.Quote
-import by.bsuir.kirylarol.wolfquotes.Entity.QuoteItem
-import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
-import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
+import by.bsuir.kirylarol.destinations.EditTaskDestination
+import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
+import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepositoryImpl
 import by.bsuir.kirylarol.wolfquotes.R
-import by.bsuir.kirylarol.wolfquotes.Screens.destinations.EditQuoteDestination
+import by.bsuir.kirylarol.wolftasks.Entity.Task
+import by.bsuir.kirylarol.wolftasks.Entity.TaskItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 import kotlin.random.Random
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 sealed interface HomeState {
     data object Loading : HomeState
     data object Empty : HomeState
-    data class DisplayingQuotes(val quotes: List<Quote>) : HomeState
+    data class DisplayingTasks(val tasks: List<Task>) : HomeState
     data class Error(val e: Exception) : HomeState
 
 }
 
 class HomeViewModel(
-    private val repository: QuoteRepository = QuoteRepositoryImpl,
+    private val repository: TaskRepository
 ) : ViewModel() {
-
     private val loading = MutableStateFlow(false)
 
     val state = combine(
-        repository.getQuotes(),
+        repository.getTasks(),
         loading,
-    ) { quotes, loading ->
-        if (loading) HomeState.Loading else HomeState.DisplayingQuotes(quotes)
+    ) { tasks, loading ->
+        if (loading) HomeState.Loading else HomeState.DisplayingTasks(tasks)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), HomeState.Loading)
 
@@ -99,39 +101,43 @@ class HomeViewModel(
         repository.setDone(id)
         loading.update { false }
     }
+
 }
 
 
 @RootNavGraph(start = true)
 @Destination
 @Composable
-fun QuotesWindow(
-    navigator: DestinationsNavigator
+fun TasksWindow(
+    navigator: DestinationsNavigator,
+    viewModel : HomeViewModel = koinViewModel()
 ) {
-    val viewModel = viewModel<HomeViewModel>()
+
     val state by viewModel.state.collectAsStateWithLifecycle()
-    QuotesContent(
+    TasksContent(
         state = state,
         onEdit = {
-            navigator.navigate(EditQuoteDestination(it, true))
+            navigator.navigate(EditTaskDestination(it, true))
         },
         onInfo = {
-            navigator.navigate(EditQuoteDestination(it, false))
+            navigator.navigate(EditTaskDestination(it, false))
         },
         onRemove = viewModel::onClickRemove,
         onDone = viewModel::onClickDone
     )
 }
 
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun QuotesContent(
+fun TasksContent(
     state: HomeState,
     onRemove: (id: UUID) -> Unit,
     onEdit: (id: UUID?) -> Unit,
     onInfo: (id: UUID?) -> Unit,
     onDone: (id: UUID) -> Unit
 ) {
+
 
     val errorText = stringResource(R.string.error);
     val scope = rememberCoroutineScope()
@@ -163,7 +169,7 @@ fun QuotesContent(
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "AddQuote",
+                    contentDescription = "AddTask",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -176,17 +182,17 @@ fun QuotesContent(
             )
         }
         when (state) {
-            is HomeState.DisplayingQuotes -> LazyColumn(
+            is HomeState.DisplayingTasks -> LazyColumn(
                 Modifier.padding(5.dp)
             ) {
                 items(
-                    items = state.quotes,
+                    items = state.tasks,
                     key = {
                         it.id
                     }
                 ) { item ->
-                    QuoteItem(
-                        quote = item,
+                    TaskItem(
+                        task = item,
                         modifier = Modifier
                             .heightIn(200.dp, 220.dp)
                             .padding(5.dp),
@@ -223,8 +229,8 @@ fun QuotesContent(
 
 @Preview
 @Composable
-fun QuotesWindowPreview() {
-    QuotesWindow(navigator = EmptyDestinationsNavigator)
+fun TasksWindowPreview() {
+    TasksWindow(navigator = EmptyDestinationsNavigator)
 }
 
 

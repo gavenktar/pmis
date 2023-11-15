@@ -7,9 +7,13 @@ plugins {
     kotlin("plugin.serialization") version "1.9.0"
 }
 
+
+
 buildscript {
     dependencies {
         classpath(kotlin("gradle-plugin", version = "1.9.10"))
     }
 }
+
+
 true // Needed to make the Suppress annotation work for the plugins block

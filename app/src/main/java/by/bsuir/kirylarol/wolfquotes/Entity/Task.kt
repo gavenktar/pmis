@@ -1,4 +1,4 @@
-package by.bsuir.kirylarol.wolfquotes.Entity
+package by.bsuir.kirylarol.wolftasks.Entity
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -35,7 +35,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-data class Quote(
+data class Task(
     val title: String = "",
     val description: String = "",
     val dateCreated: LocalDate = LocalDate.now(),
@@ -49,10 +49,10 @@ data class Quote(
 @Composable
 fun CardIcon(
     iconID:  ImageVector,
-    onClick:  (Quote) -> Unit,
+    onClick:  (Task) -> Unit,
     modifier: Modifier = Modifier,
     content : String,
-    quote : Quote
+    task : Task
 ){
 
     IconButton(
@@ -63,7 +63,7 @@ fun CardIcon(
                 MaterialTheme.shapes.small
             )
             .aspectRatio(1.0f),
-        onClick = { onClick(quote) },
+        onClick = { onClick(task) },
     ) {
         Icon(
             imageVector = iconID,
@@ -75,12 +75,12 @@ fun CardIcon(
 }
 
 @Composable
-fun QuoteItem(
-    quote : Quote,
-    onInfo : (Quote) -> Unit,
+fun TaskItem(
+    task : Task,
+    onInfo : (Task) -> Unit,
     onComplete : (UUID) -> Unit,
-    onEdit : (Quote) -> Unit,
-    onRemove : (Quote) -> Unit,
+    onEdit : (Task) -> Unit,
+    onRemove : (Task) -> Unit,
     modifier: Modifier = Modifier
 )
 {
@@ -93,7 +93,7 @@ fun QuoteItem(
         Row (modifier = Modifier.fillMaxSize()) {
             Column (modifier = modifier.fillMaxWidth(0.5f)){
                 Text(
-                    text = quote.title,
+                    text = task.title,
                     modifier = Modifier.padding(10.dp),
                     style = MaterialTheme.typography.titleLarge
                 )
@@ -106,10 +106,10 @@ fun QuoteItem(
                             .fillMaxHeight()
                             .padding(10.dp)
                     ){
-                        DateCard(date = quote.dateCreated, modifier = Modifier
+                        DateCard(date = task.dateCreated, modifier = Modifier
                             .fillMaxHeight(0.5f)
                             .padding(5.dp))
-                        DateCard(date = quote.dateEnd, modifier = Modifier
+                        DateCard(date = task.dateEnd, modifier = Modifier
                             .fillMaxHeight()
                             .padding(5.dp))
                     }
@@ -126,15 +126,15 @@ fun QuoteItem(
                     .weight(1f)
                 ) {
                     var Icon = Icons.Default.Close;
-                    if (!quote.completed){
+                    if (!task.completed){
                         Icon = Icons.Default.Check
                     }
                     CardIcon(
                         modifier = modifier,
                         iconID = Icon,
-                        onClick ={ onComplete(quote.id) },
+                        onClick ={ onComplete(task.id) },
                         content = "Complete",
-                        quote = quote
+                        task = task
                     )
                 }
                 Spacer(modifier = Modifier.height(5.dp))
@@ -146,9 +146,9 @@ fun QuoteItem(
                     CardIcon(
                         modifier = modifier,
                         iconID = Icons.Default.Info,
-                        onClick = {onInfo(quote)},
+                        onClick = {onInfo(task)},
                         content = "Info",
-                        quote = quote
+                        task = task
                     )
                     }
                 Spacer(modifier = Modifier.height(5.dp))
@@ -160,9 +160,9 @@ fun QuoteItem(
                     CardIcon(
                         modifier = modifier,
                         iconID = Icons.Default.Edit,
-                        onClick =  {onEdit(quote)},
+                        onClick =  {onEdit(task)},
                         content = "Edit",
-                        quote = quote
+                        task = task
                     )
                 }
                 Spacer(modifier = Modifier.height(5.dp))
@@ -174,9 +174,9 @@ fun QuoteItem(
                     CardIcon(
                         modifier = modifier,
                         iconID = Icons.Default.Delete,
-                        onClick = { onRemove(quote) },
+                        onClick = { onRemove(task) },
                         content = "Remove",
-                        quote = quote
+                        task = task
                     )
                     }
 
@@ -220,10 +220,10 @@ fun DateCard(
 
 @Composable
 @Preview(device = "spec:parent=pixel_5,orientation=portrait")
-fun QuoteItemPreview(
+fun TaskItemPreview(
 )
 {
     Box(Modifier.fillMaxSize()) {
-        QuoteItem(Quote("Сделать сто подтягиваний", "Все понятно?", LocalDate.of(2023,6,6),LocalDate.of(2023,7,6),true), {} , {}, {}, {});
+        TaskItem(Task("Сделать сто подтягиваний", "Все понятно?", LocalDate.of(2023,6,6),LocalDate.of(2023,7,6),true), {} , {}, {}, {});
     }
 }

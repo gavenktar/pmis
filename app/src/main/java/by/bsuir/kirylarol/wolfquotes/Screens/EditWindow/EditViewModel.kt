@@ -1,10 +1,11 @@
-package by.bsuir.kirylarol.wolfquotes.Screens.EditWindow
+package by.bsuir.kirylarol.wolftasks.Screens.EditWindow
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.bsuir.kirylarol.wolfquotes.Entity.Quote
-import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
-import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
+import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
+import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepositoryImpl
+import by.bsuir.kirylarol.wolftasks.Entity.Task
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import java.util.UUID
@@ -18,7 +19,7 @@ import java.time.LocalDate
 sealed interface EditViewState {
     data object Loading : EditViewState
     data class Error(val e: Exception) : EditViewState
-    data class EditingQuote(val title: String,
+    data class EditingTask(val title: String,
                             val description: String,
                             val dateCreated: LocalDate,
                             val dateEnd: LocalDate,
@@ -27,26 +28,26 @@ sealed interface EditViewState {
         EditViewState
 }
 
-class EditQuoteViewModel(
+class EditTaskViewModel(
     private val id: UUID?,
-    private val repo: QuoteRepository = QuoteRepositoryImpl,
+    private val repo: TaskRepository,
 ) : ViewModel() {
 
     private val saved = MutableStateFlow(false)
     private val loading = MutableStateFlow(false)
 
     val state = combine(
-        repo.getQuote(id),
+        repo.getTask(id),
         saved,
         loading,
-    ) { quote, saved, loading ->
-        if (loading) EditViewState.Loading else EditViewState.EditingQuote(
-            quote?.title ?: "",
-            quote?.description ?: "",
-            quote?.dateCreated ?: LocalDate.now(),
-            quote?.dateEnd ?: LocalDate.now(),
-            quote?.completed ?: false,
-            quote?.id,
+    ) { task, saved, loading ->
+        if (loading) EditViewState.Loading else EditViewState.EditingTask(
+            task?.title ?: "",
+            task?.description ?: "",
+            task?.dateCreated ?: LocalDate.now(),
+            task?.dateEnd ?: LocalDate.now(),
+            task?.completed ?: false,
+            task?.id,
             saved
         )
     }
@@ -61,7 +62,7 @@ class EditQuoteViewModel(
         id : UUID?
     ) = viewModelScope.launch {
         loading.update { true }
-        repo.upsert(Quote(title, description, dateCreated, dateEnd, completed, id ?: UUID.randomUUID()))
+        repo.upsert(Task(title, description, dateCreated, dateEnd, completed, id ?: UUID.randomUUID()))
         loading.update { false }
         saved.update { true }
     }

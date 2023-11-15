@@ -16,6 +16,8 @@ ksp {
 android {
     namespace = "by.bsuir.kirylarol.wolfquotes"
     compileSdk = 34
+    buildFeatures.compose = true
+
 
     defaultConfig {
         applicationId = "by.bsuir.kirylarol.wolfquotes"
@@ -79,6 +81,12 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.server.data.conversion)
     implementation(libs.ktor.client.cio)
+    implementation(libs.androidx.runtime)
+    implementation(libs.insert.koin.koin.core)
+    implementation(libs.insert.koin.koin.android)
+    implementation(libs.insert.koin.koin.compose)
+    implementation(libs.insert.koin.koin.android)
+    implementation(libs.koin.androidx.compose)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
