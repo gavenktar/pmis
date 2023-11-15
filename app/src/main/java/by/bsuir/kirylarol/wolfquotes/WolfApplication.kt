@@ -23,16 +23,16 @@ val databaseModule = module {
     single<TaskDao> { get<AppDatabase>().taskDao() }
     single<TaskDataSource> { RoomTaskDataSource (get<TaskDao>() ) }
     single<TaskRepository> { TaskRepositoryImpl(get()) }
+
+}
+
+val viewModule = module {
     viewModel<HomeViewModel>() {
         HomeViewModel(get())
     }
     viewModel<EditTaskViewModel>() { (id: UUID?) ->
-        EditTaskViewModel(id, get())
+        EditTaskViewModel(get(),id)
     }
-}
-
-val viewModule = module {
-
 }
 
 

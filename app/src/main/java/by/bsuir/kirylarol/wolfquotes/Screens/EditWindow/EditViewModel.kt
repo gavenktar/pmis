@@ -29,8 +29,8 @@ sealed interface EditViewState {
 }
 
 class EditTaskViewModel(
-    private val id: UUID?,
     private val repo: TaskRepository,
+    private val id: UUID?,
 ) : ViewModel() {
 
     private val saved = MutableStateFlow(false)

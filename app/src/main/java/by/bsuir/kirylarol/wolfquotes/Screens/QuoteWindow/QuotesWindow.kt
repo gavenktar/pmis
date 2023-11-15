@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -213,11 +212,14 @@ fun TasksContent(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
+                    /*
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize(0.5f)
                             .align(Alignment.Center)
                     )
+
+                     */
                 }
             }
 

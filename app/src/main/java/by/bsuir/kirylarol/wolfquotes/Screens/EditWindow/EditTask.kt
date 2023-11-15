@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolftasks.Screens.QuoteWindow.HomeViewModel
+import io.ktor.http.parametersOf
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 import java.util.UUID
 
@@ -50,7 +51,9 @@ fun EditTask(
     taskUUID: UUID?,
     navigator: DestinationsNavigator = EmptyDestinationsNavigator,
     changeMode : Boolean,
-    viewModel : EditTaskViewModel = koinViewModel()
+    viewModel: EditTaskViewModel = koinViewModel(
+        parameters = { parametersOf(taskUUID) }
+    )
 
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,7 +94,7 @@ fun EditTaskContent(
         ) {
             when (state) {
                 is EditViewState.Error -> Text(state.e.message ?: stringResource(id = R.string.error_message))
-                is EditViewState.Loading -> CircularProgressIndicator()
+                is EditViewState.Loading -> {}/* CircularProgressIndicator() */
                 is EditViewState.EditingTask -> {
                     var showBottomSheet by remember { mutableStateOf(true) }
                     var title by remember(state.title) { mutableStateOf(state.title) }
