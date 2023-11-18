@@ -110,6 +110,7 @@ ktor-ktor-serialization = { group = "io.ktor", name = "ktor-serialization", vers
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version = "2.3.6" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version = "2.3.6" }
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version = "2.3.6" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version = "1.6.1" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

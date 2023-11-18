@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.ktor.client.serialization)
 //    implementation(libs.kotlinx.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation(libs.androidx.monitor)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
 

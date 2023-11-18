@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,8 +33,10 @@ import by.bsuir.kirylarol.NavGraphs
 import by.bsuir.kirylarol.appCurrentDestinationAsState
 import by.bsuir.kirylarol.destinations.AboutScreenDestination
 import by.bsuir.kirylarol.destinations.DirectionDestination
+import by.bsuir.kirylarol.destinations.QuotesWindowDestination
 import by.bsuir.kirylarol.destinations.TasksWindowDestination
 import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolfquotes.Screens.FavoriteQuotes.QuotesWindow
 import com.google.accompanist.navigation.material.*
 import com.ramcosta.*;
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -108,7 +111,9 @@ fun NavBarBadge(it: NavigationBarItem, contentColor: Color, badge: (NavigationBa
 
 enum class NavigationBarItem(val icon: ImageVector, @StringRes val label: Int) { // у энамов могут быть параметры в котлине
     Home(Icons.Default.Home, R.string.bottom_bar_label_home),
-    About(Icons.Default.Info, R.string.bottom_bar_label_about)
+
+    About(Icons.Default.Info, R.string.bottom_bar_label_about),
+    Quotes(Icons.Default.Favorite, R.string.FavoriteQuotes)
 }
 
 enum class DisabledBottomBar(@StringRes val label: Int){
@@ -126,6 +131,7 @@ internal val NavigationBarItem.destination: DirectionDestination
     get() = when (this) {
         NavigationBarItem.Home -> TasksWindowDestination
         NavigationBarItem.About -> AboutScreenDestination
+        NavigationBarItem.Quotes -> QuotesWindowDestination
     }
 
 internal val DisabledBottomBar.destination: DirectionDestination

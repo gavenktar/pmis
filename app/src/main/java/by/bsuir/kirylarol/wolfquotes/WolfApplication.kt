@@ -14,6 +14,7 @@ import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
 import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
 import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.ShowQuoteViewModel
+import by.bsuir.kirylarol.wolfquotes.Screens.FavoriteQuotes.QuoteViewModel
 import by.bsuir.kirylarol.wolftasks.DataSource.RoomTaskDataSource
 import by.bsuir.kirylarol.wolftasks.DataSource.TaskDataSource
 import by.bsuir.kirylarol.wolftasks.Screens.EditWindow.EditTaskViewModel
@@ -50,6 +51,8 @@ val viewModule = module {
     viewModel<ShowQuoteViewModel>{
        ShowQuoteViewModel (get<QuoteRepository>(),get<QuoteService>(), null)
     }
+    viewModel <QuoteViewModel>{ QuoteViewModel(get()) }
+
 }
 
 
@@ -67,7 +70,9 @@ val appModule = module {
     includes(networkModule)
     includes(databaseModule)
     includes(viewModule)
+
 }
+
 
 class WolfApplication : Application() {
 
