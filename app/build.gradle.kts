@@ -1,8 +1,10 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ.19369 is fixed
 plugins {
+    kotlin("jvm") version "1.9.10" apply false
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
+    kotlin("plugin.serialization") version "1.9.10"
 
 }
 
@@ -16,8 +18,6 @@ ksp {
 android {
     namespace = "by.bsuir.kirylarol.wolfquotes"
     compileSdk = 34
-    buildFeatures.compose = true
-
 
     defaultConfig {
         applicationId = "by.bsuir.kirylarol.wolfquotes"
@@ -77,6 +77,17 @@ dependencies {
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.ktor.client)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+   implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging)
+ //   implementation(libs.ktor.ktor.serialization)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.serialization)
+//    implementation(libs.kotlinx.serialization.json)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
 
@@ -88,7 +99,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.bundles.compose)
     implementation(libs.bundles.ktor)
-    implementation(libs.bundles.serialization)
+    //implementation(libs.bundles.serialization)
     implementation(libs.kotlin.coroutines)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.datetime)
@@ -105,7 +116,7 @@ dependencies {
     implementation(libs.compose.destinations)
     debugImplementation(libs.compose.tooling)
 
-
+    runtimeOnly(libs.ktor.client.cio)
 
 
 

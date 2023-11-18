@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -52,8 +51,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import by.bsuir.kirylarol.destinations.EditTaskDestination
 import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
-import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepositoryImpl
 import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.QuoteDialog
 import by.bsuir.kirylarol.wolftasks.Entity.Task
 import by.bsuir.kirylarol.wolftasks.Entity.TaskItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,7 +64,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 import kotlin.random.Random
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 sealed interface HomeState {
@@ -74,18 +72,23 @@ sealed interface HomeState {
     data class DisplayingTasks(val tasks: List<Task>) : HomeState
     data class Error(val e: Exception) : HomeState
 
+    data object DisplayingQuote : HomeState
+
 }
 
 class HomeViewModel(
     private val repository: TaskRepository
 ) : ViewModel() {
     private val loading = MutableStateFlow(false)
+    private val dispQuote = MutableStateFlow(false)
 
     val state = combine(
         repository.getTasks(),
         loading,
-    ) { tasks, loading ->
-        if (loading) HomeState.Loading else HomeState.DisplayingTasks(tasks)
+        dispQuote
+    ) { tasks, loading, dispQuote ->
+            if (dispQuote) HomeState.DisplayingQuote
+            else if (loading) HomeState.Loading else HomeState.DisplayingTasks(tasks)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), HomeState.Loading)
 
@@ -97,8 +100,13 @@ class HomeViewModel(
 
     fun onClickDone(id: UUID) = viewModelScope.launch {
         loading.update { true }
+        dispQuote.update { true }
         repository.setDone(id)
         loading.update { false }
+    }
+
+    fun closeQuoteWindow() {
+        dispQuote.update { false }
     }
 
 }
@@ -122,7 +130,8 @@ fun TasksWindow(
             navigator.navigate(EditTaskDestination(it, false))
         },
         onRemove = viewModel::onClickRemove,
-        onDone = viewModel::onClickDone
+        onDone = viewModel::onClickDone,
+        closeQuoteWindow = viewModel::closeQuoteWindow
     )
 }
 
@@ -134,9 +143,9 @@ fun TasksContent(
     onRemove: (id: UUID) -> Unit,
     onEdit: (id: UUID?) -> Unit,
     onInfo: (id: UUID?) -> Unit,
-    onDone: (id: UUID) -> Unit
+    onDone: (id: UUID) -> Unit,
+    closeQuoteWindow : () -> Unit
 ) {
-
 
     val errorText = stringResource(R.string.error);
     val scope = rememberCoroutineScope()
@@ -160,6 +169,7 @@ fun TasksContent(
                             duration = SnackbarDuration.Indefinite
                         )
                         showError = false;
+
                     }
                 } else {
                     showError = true;
@@ -206,6 +216,10 @@ fun TasksContent(
             is HomeState.Error -> Text(
                 state.e.message ?: stringResource(id = R.string.error_message)
             )
+
+            is HomeState.DisplayingQuote -> {
+                QuoteDialog(closeQuoteWindow);
+            }
 
             is HomeState.Loading -> {
                 Box(

@@ -35,9 +35,21 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import by.bsuir.kirylarol.wolfquotes.API.QuoteService
 import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
+import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
+import by.bsuir.kirylarol.wolftasks.Entity.Task
 import by.bsuir.kirylarol.wolftasks.Screens.QuoteWindow.HomeViewModel
 import io.ktor.http.parametersOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
@@ -50,7 +62,7 @@ import java.util.UUID
 fun EditTask(
     taskUUID: UUID?,
     navigator: DestinationsNavigator = EmptyDestinationsNavigator,
-    changeMode : Boolean,
+    changeMode: Boolean,
     viewModel: EditTaskViewModel = koinViewModel(
         parameters = { parametersOf(taskUUID) }
     )
@@ -61,8 +73,14 @@ fun EditTask(
         if ((state as? EditViewState.EditingTask)?.saved == true) navigator.navigateUp()
     }
 
-    fun onBack (){
+    fun onBack() {
         navigator.navigateUp()
+    }
+
+    fun onNavigate() {
+        /*
+        navigator.navigate(QuoteDialogDestination());
+*/
     }
 
 
@@ -71,7 +89,8 @@ fun EditTask(
         state = state,
         onSave = viewModel::onClickSave,
         onBack = ::onBack,
-        changeMode = changeMode
+        changeMode = changeMode,
+        onNavigate = ::onNavigate
     )
 
 
@@ -82,101 +101,84 @@ fun EditTask(
 @Composable
 fun EditTaskContent(
     state: EditViewState,
-    onSave:  (String, String, LocalDate, LocalDate, Boolean, UUID? )  -> Unit,
+    onSave: (String, String, LocalDate, LocalDate, Boolean, UUID?) -> Unit,
     onBack: () -> Unit,
-    changeMode : Boolean,
+    changeMode: Boolean,
+    onNavigate: () -> Unit
 ) {
-        Box(
-            modifier = Modifier
-                .defaultMinSize(minHeight = 400.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            when (state) {
-                is EditViewState.Error -> Text(state.e.message ?: stringResource(id = R.string.error_message))
-                is EditViewState.Loading -> {}/* CircularProgressIndicator() */
-                is EditViewState.EditingTask -> {
-                    var showBottomSheet by remember { mutableStateOf(true) }
-                    var title by remember(state.title) { mutableStateOf(state.title) }
-                    var description by remember(state.description) { mutableStateOf(state.description) }
-                    var dateCreated by remember(state.dateCreated) { mutableStateOf(state.dateCreated) }
-                    var dateEnd by remember(state.dateEnd) { mutableStateOf(state.dateEnd) }
-                    var completed by remember(state.completed) { mutableStateOf(state.completed) }
-                    val sheetState = rememberModalBottomSheetState(false)
-                    val start = dateCreated.toEpochDay()  * 24 * 60 * 60 * 1000L;
-                    val end = dateEnd.toEpochDay()  * 24 * 60 * 60 * 1000L;
-                    val startState = rememberDatePickerState(initialSelectedDateMillis = start , initialDisplayMode = DisplayMode.Input)
-                    val endState = rememberDatePickerState(initialSelectedDateMillis = end ,initialDisplayMode = DisplayMode.Input)
+    Box(
+        modifier = Modifier
+            .defaultMinSize(minHeight = 400.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (state) {
+            is EditViewState.Error -> Text(
+                state.e.message ?: stringResource(id = R.string.error_message)
+            )
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.wolfedit),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
+            is EditViewState.Loading -> {
+                Text("Загрузка")
+            }
 
-                    if (showBottomSheet) {
-                        ModalBottomSheet(
-                            onDismissRequest = {
-                                onBack()
-                            },
-                            sheetState = sheetState,
-                            containerColor = MaterialTheme.colorScheme.background,
+            is EditViewState.EditingTask -> {
 
-                            ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(5.dp)
-                            ) {
-                                if (changeMode) {
-                                    DatePicker(
-                                        state = startState,
-                                        modifier = Modifier
-                                            .padding(5.dp)
-                                    )
-                                    DatePicker(
-                                        state = endState,
-                                        modifier = Modifier
-                                            .padding(5.dp)
-                                    )
-                                }else{
-                                    OutlinedTextField(
-                                        value = dateCreated.toString(),
-                                        onValueChange = {
-                                        },
-                                        label = { Text(stringResource(id = R.string.startdate)) },
-                                        modifier = Modifier
-                                            .align(CenterHorizontally)
-                                            .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .weight(1f)
-                                            .padding(5.dp),
-                                        shape = MaterialTheme.shapes.small,
-                                        enabled = changeMode
-                                    )
-                                    OutlinedTextField(
-                                        value = dateEnd.toString(),
-                                        onValueChange = {
-                                        },
-                                        label = { Text(stringResource(id = R.string.finishdate)) },
-                                        modifier = Modifier
-                                            .align(CenterHorizontally)
-                                            .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .weight(1f)
-                                            .padding(5.dp),
-                                        shape = MaterialTheme.shapes.small,
-                                        enabled = changeMode
-                                    )
+                var showBottomSheet by remember { mutableStateOf(true) }
+                var title by remember(state.title) { mutableStateOf(state.title) }
+                var description by remember(state.description) { mutableStateOf(state.description) }
+                var dateCreated by remember(state.dateCreated) { mutableStateOf(state.dateCreated) }
+                var dateEnd by remember(state.dateEnd) { mutableStateOf(state.dateEnd) }
+                var completed by remember(state.completed) { mutableStateOf(state.completed) }
+                val sheetState = rememberModalBottomSheetState(false)
+                val start = dateCreated.toEpochDay() * 24 * 60 * 60 * 1000L;
+                val end = dateEnd.toEpochDay() * 24 * 60 * 60 * 1000L;
+                val startState = rememberDatePickerState(
+                    initialSelectedDateMillis = start,
+                    initialDisplayMode = DisplayMode.Input
+                )
+                val endState = rememberDatePickerState(
+                    initialSelectedDateMillis = end,
+                    initialDisplayMode = DisplayMode.Input
+                )
 
-                                }
+                Icon(
+                    painter = painterResource(id = R.drawable.wolfedit),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            onBack()
+                        },
+                        sheetState = sheetState,
+                        containerColor = MaterialTheme.colorScheme.background,
+
+                        ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(5.dp)
+                        ) {
+                            if (changeMode) {
+                                DatePicker(
+                                    state = startState,
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                )
+                                DatePicker(
+                                    state = endState,
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                )
+                            } else {
                                 OutlinedTextField(
-                                    value = title,
-                                    onValueChange = { newText ->
-                                        title = newText
+                                    value = dateCreated.toString(),
+                                    onValueChange = {
                                     },
-                                    label = { Text(stringResource(id = R.string.nameofquoute)) },
+                                    label = { Text(stringResource(id = R.string.startdate)) },
                                     modifier = Modifier
                                         .align(CenterHorizontally)
                                         .fillMaxWidth()
@@ -187,58 +189,91 @@ fun EditTaskContent(
                                     enabled = changeMode
                                 )
                                 OutlinedTextField(
-                                    value = description,
-                                    onValueChange = { newText ->
-                                        description = newText
+                                    value = dateEnd.toString(),
+                                    onValueChange = {
                                     },
-                                    label = { Text(stringResource(id = R.string.descriptionofquote)) },
+                                    label = { Text(stringResource(id = R.string.finishdate)) },
                                     modifier = Modifier
                                         .align(CenterHorizontally)
                                         .fillMaxWidth()
                                         .fillMaxSize()
-                                        .weight(2f)
+                                        .weight(1f)
                                         .padding(5.dp),
                                     shape = MaterialTheme.shapes.small,
                                     enabled = changeMode
                                 )
 
-                                FilledTonalButton(
-                                    onClick = {
-                                        if (changeMode) {
-                                                onSave(
-                                                    title,
-                                                    description,
-                                                    dateCreated,
-                                                    dateEnd,
-                                                    false,
-                                                    state.id,
-                                                )
-                                                onBack();
-                                        }else{
-                                            onBack();
-                                        }
-                                    }, modifier = Modifier
-                                        .padding(5.dp)
-                                        .fillMaxWidth()
-                                        .fillMaxSize()
-                                        .weight(0.8f),
-                                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                {
-                                    Text(
-                                        stringResource(id = R.string.submit),
-                                        modifier = Modifier,
-                                        style = MaterialTheme.typography.titleMedium
-
-                                    )
-                                }
-                                Spacer(modifier = Modifier.padding(10.dp))
                             }
+                            OutlinedTextField(
+                                value = title,
+                                onValueChange = { newText ->
+                                    title = newText
+                                },
+                                label = { Text(stringResource(id = R.string.nameofquoute)) },
+                                modifier = Modifier
+                                    .align(CenterHorizontally)
+                                    .fillMaxWidth()
+                                    .fillMaxSize()
+                                    .weight(1f)
+                                    .padding(5.dp),
+                                shape = MaterialTheme.shapes.small,
+                                enabled = changeMode
+                            )
+                            OutlinedTextField(
+                                value = description,
+                                onValueChange = { newText ->
+                                    description = newText
+                                },
+                                label = { Text(stringResource(id = R.string.descriptionofquote)) },
+                                modifier = Modifier
+                                    .align(CenterHorizontally)
+                                    .fillMaxWidth()
+                                    .fillMaxSize()
+                                    .weight(2f)
+                                    .padding(5.dp),
+                                shape = MaterialTheme.shapes.small,
+                                enabled = changeMode
+                            )
+
+                            FilledTonalButton(
+                                onClick = {
+                                    if (changeMode) {
+                                        onSave(
+                                            title,
+                                            description,
+                                            dateCreated,
+                                            dateEnd,
+                                            false,
+                                            state.id,
+                                        )
+
+                                        onBack();
+
+                                    } else {
+                                        onBack();
+                                    }
+                                }, modifier = Modifier
+                                    .padding(5.dp)
+                                    .fillMaxWidth()
+                                    .fillMaxSize()
+                                    .weight(0.8f),
+                                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            {
+                                Text(
+                                    stringResource(id = R.string.submit),
+                                    modifier = Modifier,
+                                    style = MaterialTheme.typography.titleMedium
+
+                                )
+                            }
+                            Spacer(modifier = Modifier.padding(10.dp))
                         }
                     }
                 }
             }
         }
+    }
 }
 

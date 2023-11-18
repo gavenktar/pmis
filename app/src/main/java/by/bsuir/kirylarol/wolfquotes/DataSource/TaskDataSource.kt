@@ -76,7 +76,6 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     override fun getTasks(): Flow<List<Task>> = _tasksFlow
         .asSharedFlow()
         .onStart {
-            delay(1000L)
             emit(tasks)
         }
         .map { it.values.toList() }
@@ -86,7 +85,6 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     }
 
     override suspend fun delete(id: UUID) {
-        delay(1000L)
         var task = tasks[id]
         if (task != null) {
             dao.delete(toTaskEntity(task))
@@ -96,7 +94,6 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     }
 
     override suspend fun setDone(id: UUID) {
-        delay(100L)
         var task = tasks[id];
         if (task != null) {
             task.completed = !task.completed

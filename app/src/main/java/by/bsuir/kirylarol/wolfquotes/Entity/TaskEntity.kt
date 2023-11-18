@@ -18,6 +18,6 @@ class TaskEntity (
 
 ){
     internal companion object {
-        const val TableName = "tasks" // <- удобно потом ссылаться будет
+        const val TableName = "tasks"
     }
 }
