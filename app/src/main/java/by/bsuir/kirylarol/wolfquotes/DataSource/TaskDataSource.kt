@@ -33,7 +33,7 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
 
     private lateinit var tasks: MutableMap<UUID, Task>;
 
-         init {
+    init {
         CoroutineScope(Dispatchers.IO).launch {
             dao.getAll().collect { taskEntities ->
                 tasks = taskEntities.associateBy { it.id }
@@ -76,7 +76,6 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     override fun getTasks(): Flow<List<Task>> = _tasksFlow
         .asSharedFlow()
         .onStart {
-            delay(1000L)
             emit(tasks)
         }
         .map { it.values.toList() }
@@ -86,12 +85,12 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     }
 
     override suspend fun delete(id: UUID) {
-        val task = tasks[id]
+        var task = tasks[id]
         if (task != null) {
             dao.delete(toTaskEntity(task))
-            tasks.remove(id)
-            _tasksFlow.emit(tasks)
         }
+        tasks.remove(id)
+        _tasksFlow.emit(tasks)
     }
 
     override suspend fun setDone(id: UUID) {

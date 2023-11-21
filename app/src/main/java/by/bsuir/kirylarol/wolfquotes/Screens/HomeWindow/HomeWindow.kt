@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -48,7 +47,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import by.bsuir.kirylarol.destinations.EditTaskDestination
@@ -230,14 +228,13 @@ fun TasksContent(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    Text(text = "К сожалению красивый крутящийся прикол был удален из за того что он крашит приложение(")
                     /*
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize(0.5f)
                             .align(Alignment.Center)
                     )
-                
+
                      */
                 }
             }

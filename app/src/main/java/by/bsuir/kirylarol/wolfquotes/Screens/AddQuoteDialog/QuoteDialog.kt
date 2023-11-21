@@ -14,7 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolftasks.Screens.EditWindow.EditViewState
-import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import kotlinx.coroutines.Job
@@ -37,11 +36,14 @@ fun QuoteDialog(
         viewModel.init()
     }
 
+
     QuoteContent(
         state = state,
         onSave = viewModel::onClickAdd,
         closeQuoteWindow = closeQuoteWindow
     )
+
+
 }
 
 
@@ -54,18 +56,9 @@ fun QuoteContent(
 ) {
     val icon = Icons.Default.Info
     when (state) {
-        is QuoteDialogState.Error -> {
-            Text(
-                state.e.message ?: stringResource(id = R.string.error_message)
-            )
-            TextButton(
-                onClick = {
-                    closeQuoteWindow();
-                }
-            ) {
-                Text("Выйти")
-            }
-        }
+        is QuoteDialogState.Error -> Text(
+            state.e.message ?: stringResource(id = R.string.error_message)
+        )
 
         is QuoteDialogState.Loading -> {
             println("Загрузка...");

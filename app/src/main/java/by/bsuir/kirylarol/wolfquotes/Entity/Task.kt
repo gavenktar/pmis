@@ -219,7 +219,7 @@ fun DateCard(
 }
 
 @Composable
-@Preview(device = "spec:parent=pixel_5,orientation=landscape")
+@Preview(device = "spec:parent=pixel_5,orientation=portrait")
 fun TaskItemPreview(
 )
 {

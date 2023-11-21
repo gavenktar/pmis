@@ -40,11 +40,8 @@ class ShowQuoteViewModel(
         viewModelScope.launch {
             loading.value = true
             try {
-                quote.update {
-                    quoteService.getQuote()
-                }
+                quote.update { quoteService.getQuote() }
             } catch (e: Exception) {
-
             } finally {
                 loading.value = false
             }
@@ -54,16 +51,11 @@ class ShowQuoteViewModel(
         quote,
         loading,
     ) { quote, loading ->
-        if (loading) QuoteDialogState.Loading
-        else {
-            if (quote == null)
-                QuoteDialogState.Error(RuntimeException("timed out"))
-            else QuoteDialogState.DisplayingQuote(
-                quote?.title ?: "",
-                quote?.author ?: "",
-                quote?.id
-            )
-        }
+        if (loading || quote == null) QuoteDialogState.Loading else QuoteDialogState.DisplayingQuote(
+            quote?.title ?: "",
+            quote?.author ?: "",
+            quote?.id
+        )
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QuoteDialogState.Loading)
 

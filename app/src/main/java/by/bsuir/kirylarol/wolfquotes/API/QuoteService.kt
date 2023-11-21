@@ -28,12 +28,12 @@ class QuoteServiceImpl(
 ) : QuoteService {
     override suspend fun getQuote(): Quote {
         try {
-//           var al = client.get {
-//                url(HTTP_ROUTES.getQuote)
-//            }.body<List<QuoteExternal>>()[0]
+           var al = client.get {
+                url(HTTP_ROUTES.getQuote)
+            }.body<List<QuoteExternal>>()[0]
             return Quote(
-                title = "волк волк волк",
-                author = "ВОЛК",
+                title = al.q,
+                author = al.a,
             )
         } catch (e: Exception) {
             println(e.message)

@@ -18,16 +18,13 @@ import by.bsuir.kirylarol.wolfquotes.Screens.FavoriteQuotes.QuoteViewModel
 import by.bsuir.kirylarol.wolftasks.DataSource.RoomTaskDataSource
 import by.bsuir.kirylarol.wolftasks.DataSource.TaskDataSource
 import by.bsuir.kirylarol.wolftasks.Screens.EditWindow.EditTaskViewModel
-import by.bsuir.kirylarol.wolftasks.Screens.InfoWindow.ViewModelContainer
 import by.bsuir.kirylarol.wolftasks.Screens.QuoteWindow.HomeViewModel
 import io.ktor.client.HttpClient
 import org.koin.android.ext.koin.androidContext;
-import org.koin.androidx.compose.get
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin;
 import org.koin.core.logger.Level
 import org.koin.core.logger.PrintLogger
-import org.koin.core.scope.get
 import org.koin.dsl.module
 import java.util.UUID
 
@@ -55,9 +52,7 @@ val viewModule = module {
        ShowQuoteViewModel (get<QuoteRepository>(),get<QuoteService>(), null)
     }
     viewModel <QuoteViewModel>{ QuoteViewModel(get()) }
-    viewModel<ViewModelContainer> {
-        ViewModelContainer()
-    }
+
 }
 
 
