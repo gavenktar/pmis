@@ -33,15 +33,16 @@ import by.bsuir.kirylarol.NavGraphs
 import by.bsuir.kirylarol.appCurrentDestinationAsState
 import by.bsuir.kirylarol.destinations.AboutScreenDestination
 import by.bsuir.kirylarol.destinations.DirectionDestination
+import by.bsuir.kirylarol.destinations.InfoTaskDestination
 import by.bsuir.kirylarol.destinations.QuotesWindowDestination
 import by.bsuir.kirylarol.destinations.TasksWindowDestination
 import by.bsuir.kirylarol.wolfquotes.R
-import by.bsuir.kirylarol.wolfquotes.Screens.FavoriteQuotes.QuotesWindow
 import com.google.accompanist.navigation.material.*
 import com.ramcosta.*;
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.rememberNavHostEngine
+import java.util.UUID
 
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalAnimationApi::class)
@@ -130,7 +131,8 @@ internal fun NavController.navigateTopLevel(destination: DirectionDestination) =
 internal val NavigationBarItem.destination: DirectionDestination
     get() = when (this) {
         NavigationBarItem.Home -> TasksWindowDestination
-        NavigationBarItem.About -> AboutScreenDestination
+//        NavigationBarItem.About -> AboutScreenDestination
+        NavigationBarItem.About -> InfoTaskDestination
         NavigationBarItem.Quotes -> QuotesWindowDestination
     }
 
