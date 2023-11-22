@@ -5,6 +5,7 @@ import by.bsuir.kirylarol.wolfquotes.Database.UUIDConverter
 import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import by.bsuir.kirylarol.wolfquotes.MVI.MVIViewModel
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -56,12 +57,8 @@ class QuoteViewModel(
     val repository: QuoteRepository
 ) : MVIViewModel<QuoteViewState, QuoteViewModelIntent, QuoteViewModelAction>(initial) {
 
-    val _state = MutableStateFlow<QuoteViewState>(initial)
-
     private val _snackbarEvent = MutableSharedFlow<String?>()
     val snackbarEvent = _snackbarEvent.asSharedFlow()
-
-
 
     override suspend fun reduce(intent: QuoteViewModelIntent) {
         when (intent) {
@@ -78,12 +75,12 @@ class QuoteViewModel(
             is QuoteViewModelIntent.ClickAddToFavorite -> {
                 println("В фаворите")
                 val quote = Quote(
-                    title = _state.value.title,
-                    author = _state.value.author,
+                    title = states.value.title,
+                    author = states.value.author,
                 )
                 val updatedState = QuoteViewState(
-                    title = _state.value.title,
-                    author = _state.value.author,
+                    title = states.value.title,
+                    author = states.value.author,
                     quoteSource = QuoteSource.QuoteSourceDB(quote.id.toString()),
                     isInFavorite = true,
                     showSnackBar = true,
@@ -95,6 +92,9 @@ class QuoteViewModel(
                 state {
                     updatedState
                 }
+
+
+                delay(300L)
                 event(QuoteViewModelAction.ShowSnackbar)
                 event(QuoteViewModelAction.AddToFavorite(intent.quote))
             }
@@ -105,8 +105,8 @@ class QuoteViewModel(
                     repository.delete(intent.id);
                 }
                 val updatedState = QuoteViewState(
-                    title = _state.value.title,
-                    author = _state.value.author,
+                    title = states.value.title,
+                    author = states.value.author,
                     quoteSource = QuoteSource.QuoteSourceInternet,
                     isInFavorite = false,
                     showSnackBar = true,
@@ -115,6 +115,8 @@ class QuoteViewModel(
                 state {
                     updatedState
                 }
+                delay(300L)
+
                 event(QuoteViewModelAction.ShowSnackbar)
                 event(QuoteViewModelAction.RemoveFromFavorite(intent.id))
             }

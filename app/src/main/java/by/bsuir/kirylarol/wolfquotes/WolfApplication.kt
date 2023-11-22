@@ -14,6 +14,8 @@ import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepositoryImpl
 import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
 import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.ShowQuoteViewModel
+import by.bsuir.kirylarol.wolfquotes.Screens.EditQuoteScreen.EditQuoteViewModel
+import by.bsuir.kirylarol.wolfquotes.Screens.EditQuoteScreen.EditQuoteWindowState
 import by.bsuir.kirylarol.wolfquotes.Screens.FavoriteQuotes.FavoriteQuoteViewModel
 import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewModel
 import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewState
@@ -63,6 +65,14 @@ val viewModule = module {
 }
 
 
+val editQuoteModule = module {
+    viewModel<EditQuoteViewModel>(){
+            (initial: EditQuoteWindowState) ->
+        EditQuoteViewModel(initial,get<QuoteRepository>())
+    }
+}
+
+
 val networkModule = module {
 
     single<HttpClient> { QuoteHttpClient() }
@@ -76,7 +86,7 @@ val appModule = module {
     includes(networkModule)
     includes(databaseModule)
     includes(viewModule)
-
+    includes(editQuoteModule)
 }
 
 

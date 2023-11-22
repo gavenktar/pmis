@@ -41,11 +41,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.bsuir.kirylarol.destinations.EditQuoteWindowDestination
 import by.bsuir.kirylarol.wolfquotes.DataSource.QuoteDataSource
 import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import by.bsuir.kirylarol.wolfquotes.MVI.Container
 import by.bsuir.kirylarol.wolfquotes.MVI.subscribe
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
+import by.bsuir.kirylarol.wolfquotes.Screens.EditQuoteScreen.EditQuoteWindowState
 import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteSource
 import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewModel
 import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewModelAction
@@ -87,6 +89,31 @@ fun QuoteCard(
         when (event) {
             is QuoteViewModelAction.GoBack -> {
                 navigator.navigateUp()
+            }
+
+            is QuoteViewModelAction.GoRedact -> {
+
+                if (quote != null) {
+                    var idValue: String = ""
+                    when (quote.quoteSource) {
+                        is QuoteSource.QuoteSourceDB -> {
+                            idValue = quote.quoteSource.id
+                        }
+
+                        is QuoteSource.QuoteSourceInternet -> {
+                            println("Это интернет-цитата")
+                        }
+                    }
+
+                    val initalState = EditQuoteWindowState(
+                        title = quote.title,
+                        author = quote.author,
+                        id = idValue,
+                        confirmTaked = true,
+                        showConfirmWindow = false
+                    )
+                    navigator.navigate(EditQuoteWindowDestination(initalState))
+                }
             }
 
             is QuoteViewModelAction.ShowSnackbar -> {
@@ -201,7 +228,7 @@ fun QuoteCardContent(
                             )
                         }
                     } else {
-                        var id :String = "";
+                        var id: String = "";
                         when (state.quoteSource) {
                             is QuoteSource.QuoteSourceDB -> {
                                 id = state.quoteSource.id
