@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -86,7 +87,7 @@ sealed interface QuoteState {
 
 }
 
-class QuoteViewModel(
+class FavoriteQuoteViewModel(
     private val repository: QuoteRepository
 ) : ViewModel() {
     private val loading = MutableStateFlow(false)
@@ -113,7 +114,7 @@ class QuoteViewModel(
 @Composable
 fun QuotesWindow(
     navigator: DestinationsNavigator,
-    viewModel : QuoteViewModel = koinViewModel()
+    viewModel : FavoriteQuoteViewModel = koinViewModel()
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -155,14 +156,11 @@ fun QuoteContent(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    /*
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxSize(0.5f)
-                            .align(Alignment.Center)
-                    )
-
-                     */
+//                    CircularProgressIndicator(
+//                        modifier = Modifier
+//                            .fillMaxSize(0.5f)
+//                            .align(Alignment.Center)
+//                    )
                 }
             }
 

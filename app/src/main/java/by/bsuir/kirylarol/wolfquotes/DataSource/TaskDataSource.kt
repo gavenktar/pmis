@@ -76,6 +76,7 @@ internal class RoomTaskDataSource(private val dao: TaskDao) : TaskDataSource {
     override fun getTasks(): Flow<List<Task>> = _tasksFlow
         .asSharedFlow()
         .onStart {
+            delay(1000L)
             emit(tasks)
         }
         .map { it.values.toList() }

@@ -55,6 +55,7 @@ import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.QuoteDialog
 import by.bsuir.kirylarol.wolftasks.Entity.Task
 import by.bsuir.kirylarol.wolftasks.Entity.TaskItem
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -95,6 +96,7 @@ class HomeViewModel(
     fun onClickRemove(id: UUID) = viewModelScope.launch {
         loading.update { true }
         repository.delete(id)
+            delay(100L)
         loading.update { false }
     }
 
