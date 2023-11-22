@@ -74,7 +74,7 @@ inline fun <reified T, S, I, E> container(
 @Destination
 @Composable
 fun QuoteCard(
-    quote: QuoteViewState,
+    quote: QuoteViewState?,
     navigator: DestinationsNavigator = EmptyDestinationsNavigator,
 ) {
     var currentMessage: String = ""
@@ -201,7 +201,7 @@ fun QuoteCardContent(
                             )
                         }
                     } else {
-                        var id: UUID? = null;
+                        var id :String = "";
                         when (state.quoteSource) {
                             is QuoteSource.QuoteSourceDB -> {
                                 id = state.quoteSource.id
@@ -214,7 +214,7 @@ fun QuoteCardContent(
                             onClick = {
                                 intent(
                                     QuoteViewModelIntent.ClickRemoveFromFavorite(
-                                        id
+                                        UUID.fromString(id)
                                     )
                                 )
                             }
@@ -249,12 +249,12 @@ fun QuoteCardContentPreview() {
     val quote = QuoteViewState(
         title = "To be or not to be, that is the question.",
         author = "William Shakespeare",
-        quoteSource = QuoteSource.QuoteSourceDB(UUID(2, 3)),
+        quoteSource = QuoteSource.QuoteSourceDB("хуйхуйхухй"),
         isInFavorite = false,
         showSnackBar = false,
         snackBarMessage = null
     )
-    QuoteCard(quote);
+//    QuoteCard(quote);
 }
 
 

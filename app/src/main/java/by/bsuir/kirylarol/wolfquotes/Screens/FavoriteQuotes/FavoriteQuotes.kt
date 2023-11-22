@@ -4,6 +4,7 @@ import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
 import android.annotation.SuppressLint
 import android.graphics.Color
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,9 +62,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import by.bsuir.kirylarol.destinations.EditTaskDestination
+import by.bsuir.kirylarol.destinations.QuoteCardDestination
 import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
 import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.QuoteDialog
+import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteSource
+import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewState
 import by.bsuir.kirylarol.wolftasks.Entity.Task
 import by.bsuir.kirylarol.wolftasks.Entity.TaskItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -114,14 +118,30 @@ class FavoriteQuoteViewModel(
 @Composable
 fun QuotesWindow(
     navigator: DestinationsNavigator,
-    viewModel : FavoriteQuoteViewModel = koinViewModel()
+    viewModel: FavoriteQuoteViewModel = koinViewModel()
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    fun onCardClick(quote: Quote) {
+        val initalState = QuoteViewState(
+            title = quote.title,
+            author = quote.author,
+            quoteSource = QuoteSource.QuoteSourceDB(quote.id.toString()),
+            isInFavorite = true,
+            showSnackBar = false,
+            snackBarMessage = null
+        )
+
+        navigator.navigate(
+            QuoteCardDestination(initalState)
+        )
+    }
+
     QuoteContent(
         state = state,
         onRemove = viewModel::onClickRemove,
+        onCardClick = ::onCardClick
     )
 }
 
@@ -131,6 +151,7 @@ fun QuotesWindow(
 fun QuoteContent(
     state: QuoteState,
     onRemove: (id: UUID) -> Unit,
+    onCardClick: (quote: Quote) -> Unit
 ) {
 
     val errorText = stringResource(R.string.error);
@@ -141,7 +162,8 @@ fun QuoteContent(
                     QuoteCard(
                         quote = quote.title,
                         author = quote.author,
-                        onDeleteClick = { onRemove(quote.id) }
+                        onDeleteClick = { onRemove(quote.id) },
+                        onCardClick = { onCardClick(quote) }
                     )
                 }
             }
@@ -168,11 +190,13 @@ fun QuoteContent(
         }
     }
 }
+
 @Composable
 fun QuoteCard(
     quote: String,
     author: String,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onCardClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -183,6 +207,9 @@ fun QuoteCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                    onCardClick();
+                }
                 .padding(16.dp)
         ) {
             Text(
@@ -221,7 +248,8 @@ fun QuoteCardPreview() {
     QuoteCard(
         quote = "This is a sample quote.",
         author = "John Doe",
-        onDeleteClick = {}
+        onDeleteClick = {},
+        onCardClick = {},
     )
 }
 

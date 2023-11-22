@@ -1,20 +1,27 @@
 package by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards
 
+import androidx.room.TypeConverters
+import by.bsuir.kirylarol.wolfquotes.Database.UUIDConverter
 import by.bsuir.kirylarol.wolfquotes.Entity.Quote
 import by.bsuir.kirylarol.wolfquotes.MVI.MVIViewModel
 import by.bsuir.kirylarol.wolfquotes.Repository.QuoteRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.serialization.Serializable
 
 import java.util.UUID
 
-
+@Serializable
 sealed class QuoteSource {
-    data class QuoteSourceDB(val id: UUID) : QuoteSource()
+    @Serializable
+    data class QuoteSourceDB(val id: String) : QuoteSource()
+    @Serializable
     data object QuoteSourceInternet : QuoteSource()
 }
 
+
+@Serializable
 class QuoteViewState(
     val title: String = "",
     val author: String = "",
@@ -77,7 +84,7 @@ class QuoteViewModel(
                 val updatedState = QuoteViewState(
                     title = _state.value.title,
                     author = _state.value.author,
-                    quoteSource = QuoteSource.QuoteSourceDB(quote.id),
+                    quoteSource = QuoteSource.QuoteSourceDB(quote.id.toString()),
                     isInFavorite = true,
                     showSnackBar = true,
                     snackBarMessage = "Добавлено в любимые",

@@ -1,8 +1,17 @@
 package by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -10,9 +19,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import by.bsuir.kirylarol.destinations.QuoteCardDestination
 import by.bsuir.kirylarol.wolfquotes.R
+import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteSource
+import by.bsuir.kirylarol.wolfquotes.Screens.QuoteCards.QuoteViewState
 import by.bsuir.kirylarol.wolftasks.Screens.EditWindow.EditViewState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -24,11 +43,10 @@ import kotlin.reflect.KFunction3
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-// @com.ramcosta.composedestinations.annotation.Destination
+@com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun QuoteDialog(
-    //  navigator: DestinationsNavigator = EmptyDestinationsNavigator,
-    closeQuoteWindow: () -> Unit,
+    navigator: DestinationsNavigator = EmptyDestinationsNavigator,
     viewModel: ShowQuoteViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -37,10 +55,36 @@ fun QuoteDialog(
         viewModel.init()
     }
 
+    fun onCardClick (){
+        when (state){
+            is QuoteDialogState.DisplayingQuote ->{
+                val title = (state as QuoteDialogState.DisplayingQuote).title
+                val author = (state as QuoteDialogState.DisplayingQuote).author
+                val initial = QuoteViewState(
+                    title = title,
+                    author = author,
+                    quoteSource = QuoteSource.QuoteSourceInternet,
+                    isInFavorite = false,
+                    showSnackBar = false,
+                    snackBarMessage = null
+                )
+                    navigator.navigate(
+                        QuoteCardDestination(
+                            initial
+                        )
+                    )
+            }
+
+            else -> {}
+        }
+
+    }
+
     QuoteContent(
         state = state,
         onSave = viewModel::onClickAdd,
-        closeQuoteWindow = closeQuoteWindow
+        closeQuoteWindow = { navigator.navigateUp() },
+        onCardClick = ::onCardClick
     )
 }
 
@@ -50,7 +94,8 @@ fun QuoteDialog(
 fun QuoteContent(
     state: QuoteDialogState,
     onSave: (String, String, UUID?) -> Unit,
-    closeQuoteWindow: () -> Unit
+    closeQuoteWindow: () -> Unit,
+    onCardClick : () -> Unit
 ) {
     val icon = Icons.Default.Info
     when (state) {
@@ -73,39 +118,62 @@ fun QuoteContent(
 
         is QuoteDialogState.DisplayingQuote -> {
             println("Err")
-            AlertDialog(
-                icon = {
-                    Icon(icon, contentDescription = "Example Icon")
-                },
-                title = {
-                    Text(text = state.title)
-                },
-                text = {
-                    Text(text = state.author)
-                },
-                onDismissRequest = {
-                    closeQuoteWindow()
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            onSave(state.title, state.author, UUID.randomUUID())
-                            closeQuoteWindow();
-                        }
-                    ) {
-                        Text("Сохранить цитатку")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            closeQuoteWindow();
-                        }
-                    ) {
-                        Text("Выйти")
-                    }
-                }
-            )
+           Dialog(onDismissRequest = { closeQuoteWindow() }) {
+               Card(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .clickable {
+                           onCardClick();
+                       }
+                       .padding(16.dp),
+               ) {
+                   Column(
+                       modifier = Modifier
+                           .padding(16.dp)
+                   ) {
+                       Spacer(modifier = Modifier.height(16.dp))
+
+                       Text(
+                           text = state.title,
+                           style = TextStyle(
+                               fontWeight = FontWeight.Bold,
+                               fontSize = 20.sp
+                           )
+                       )
+
+                       Spacer(modifier = Modifier.height(8.dp))
+
+                       Text(text = state.author)
+
+                       Spacer(modifier = Modifier.height(16.dp))
+
+                       Row(
+                           modifier = Modifier
+                               .fillMaxWidth()
+                               .padding(horizontal = 8.dp),
+                           horizontalArrangement = Arrangement.SpaceBetween
+                       ) {
+                           TextButton(
+                               onClick = {
+                                   onSave(state.title, state.author, UUID.randomUUID())
+                                   closeQuoteWindow()
+                               }
+                           ) {
+                               Text("Сохранить цитатку")
+                           }
+
+                           TextButton(
+                               onClick = {
+                                   closeQuoteWindow()
+                               }
+                           ) {
+                               Text("Выйти")
+                           }
+                       }
+                   }
+           }
+
+            }
         }
     }
 }

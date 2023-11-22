@@ -50,6 +50,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import by.bsuir.kirylarol.destinations.EditTaskDestination
+import by.bsuir.kirylarol.destinations.QuoteDialogDestination
 import by.bsuir.kirylarol.wolfquotes.Repository.TaskRepository
 import by.bsuir.kirylarol.wolfquotes.R
 import by.bsuir.kirylarol.wolfquotes.Screens.AddQuoteDialog.QuoteDialog
@@ -111,6 +112,10 @@ class HomeViewModel(
         dispQuote.update { false }
     }
 
+    fun stopMotivate() {
+        dispQuote.update { false }
+    }
+
 }
 
 
@@ -121,7 +126,6 @@ fun TasksWindow(
     navigator: DestinationsNavigator,
     viewModel : HomeViewModel = koinViewModel()
 ) {
-
     val state by viewModel.state.collectAsStateWithLifecycle()
     TasksContent(
         state = state,
@@ -133,7 +137,12 @@ fun TasksWindow(
         },
         onRemove = viewModel::onClickRemove,
         onDone = viewModel::onClickDone,
-        closeQuoteWindow = viewModel::closeQuoteWindow
+        closeQuoteWindow = viewModel::closeQuoteWindow,
+        onMotivate ={
+            viewModel.stopMotivate();
+            navigator.navigate(QuoteDialogDestination)
+            viewModel.stopMotivate();
+        }
     )
 }
 
@@ -146,6 +155,7 @@ fun TasksContent(
     onEdit: (id: UUID?) -> Unit,
     onInfo: (id: UUID?) -> Unit,
     onDone: (id: UUID) -> Unit,
+    onMotivate: () -> Unit,
     closeQuoteWindow : () -> Unit
 ) {
 
@@ -220,7 +230,7 @@ fun TasksContent(
             )
 
             is HomeState.DisplayingQuote -> {
-                QuoteDialog(closeQuoteWindow);
+                onMotivate();
             }
 
             is HomeState.Loading -> {

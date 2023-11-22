@@ -33,6 +33,7 @@ import by.bsuir.kirylarol.NavGraphs
 import by.bsuir.kirylarol.appCurrentDestinationAsState
 import by.bsuir.kirylarol.destinations.AboutScreenDestination
 import by.bsuir.kirylarol.destinations.DirectionDestination
+import by.bsuir.kirylarol.destinations.QuoteCardDestination
 import by.bsuir.kirylarol.destinations.QuotesWindowDestination
 import by.bsuir.kirylarol.destinations.TasksWindowDestination
 import by.bsuir.kirylarol.wolfquotes.R
@@ -53,27 +54,28 @@ fun WolfTracker() {
     val navController = rememberNavController().apply {
         navigatorProvider += bottomSheetNavigator
     }
-    val currentDestination = navController.appCurrentDestinationAsState() // <- из compose-destinations
+    val currentDestination =
+        navController.appCurrentDestinationAsState() // <- из compose-destinations
     val showBottomBar by remember { derivedStateOf { currentDestination.value !in excludeList } }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .sizeIn(minWidth = 1.dp, minHeight = 1.dp),
-        ) {
-            DestinationsNavHost(
-                modifier = Modifier.weight(1f),
-                navGraph = NavGraphs.root,
-                engine = navHostEngine,
-                navController = navController,
-                dependenciesContainerBuilder = { },
-                )
-            AnimatedVisibility(showBottomBar) {
-                WolfNavigationBar(
-                    onItemClick = navController.bottomBarHandler,
-                    isSelected = { currentDestination.value == it.destination },
-                )
-            }
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .sizeIn(minWidth = 1.dp, minHeight = 1.dp),
+    ) {
+        DestinationsNavHost(
+            modifier = Modifier.weight(1f),
+            navGraph = NavGraphs.root,
+            engine = navHostEngine,
+            navController = navController,
+            dependenciesContainerBuilder = { },
+        )
+        AnimatedVisibility(showBottomBar) {
+            WolfNavigationBar(
+                onItemClick = navController.bottomBarHandler,
+                isSelected = { currentDestination.value == it.destination },
+            )
         }
+    }
 }
 
 @Composable
@@ -106,32 +108,35 @@ fun NavBarLabel(it: NavigationBarItem) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavBarBadge(it: NavigationBarItem, contentColor: Color, badge: (NavigationBarItem) -> Int?) {
-    Icon(imageVector = it.icon , contentDescription = it.name)
+    Icon(imageVector = it.icon, contentDescription = it.name)
 }
 
-enum class NavigationBarItem(val icon: ImageVector, @StringRes val label: Int) { // у энамов могут быть параметры в котлине
+enum class NavigationBarItem(
+    val icon: ImageVector,
+    @StringRes val label: Int
+) {
     Home(Icons.Default.Home, R.string.bottom_bar_label_home),
 
     About(Icons.Default.Info, R.string.bottom_bar_label_about),
     Quotes(Icons.Default.Favorite, R.string.FavoriteQuotes)
 }
 
-enum class DisabledBottomBar(@StringRes val label: Int){
+enum class DisabledBottomBar(@StringRes val label: Int) {
     About(R.string.bottom_bar_label_about),
 }
 
 internal val NavController.bottomBarHandler
     get() = { it: NavigationBarItem -> navigateTopLevel(it.destination) }
 
-internal fun NavController.navigateTopLevel(destination: DirectionDestination) = navigate(destination) {
-    launchSingleTop = true
-}
+internal fun NavController.navigateTopLevel(destination: DirectionDestination) =
+    navigate(destination) {
+        launchSingleTop = true
+    }
 
 internal val NavigationBarItem.destination: DirectionDestination
     get() = when (this) {
         NavigationBarItem.Home -> TasksWindowDestination
-//        NavigationBarItem.About -> AboutScreenDestination
-            //  NavigationBarItem.About -> QuoteCardDestination
+        NavigationBarItem.About -> AboutScreenDestination
         NavigationBarItem.Quotes -> QuotesWindowDestination
         else -> {
             throw Exception();
@@ -144,4 +149,4 @@ internal val DisabledBottomBar.destination: DirectionDestination
     }
 
 internal val BottomBarDestinations = NavigationBarItem.entries.map { it.destination }.toSet()
-internal val excludeList = DisabledBottomBar.entries.map{it.destination}.toSet()
+internal val excludeList = DisabledBottomBar.entries.map { it.destination }.toSet()
